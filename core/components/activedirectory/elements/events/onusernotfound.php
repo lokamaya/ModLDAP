@@ -54,7 +54,7 @@ if ($madDriver->authenticate($username,$scriptProperties['password'])) {
         $profile = $modx->newObject('modUserProfile');
         $profile->set('internalKey',$user->get('id'));
         $profile->save();
-        $user->Profile =& $profile;
+        $user->Profile = $profile;
     } else {
         $user->getOne('Profile');
     }
