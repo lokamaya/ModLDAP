@@ -52,6 +52,10 @@ if ($user->get('class_key') != 'activeDirectoryXUser') {
     $username = is_object($user) ? $user->get('username') : $user;
     $modx->log(modX::LOG_LEVEL_INFO, '[ActiveDirectoryX] User "' . $username . '" is not a activeDirectoryXUser and therefore is being skipped.');
 
+    if ($modx->getOption('activedirectoryx.only_ad_logins', null, false)) {
+        $user->set('password', '');
+    }
+
     return;
 }
 

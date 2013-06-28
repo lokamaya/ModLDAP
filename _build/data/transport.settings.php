@@ -49,6 +49,15 @@ $settings['activedirectoryx.enabled']->fromArray(array(
     'area' => 'ActiveDirectoryX',
 ),'',true,true);
 
+$settings['activedirectoryx.only_ad_logins']= $modx->newObject('modSystemSetting');
+$settings['activedirectoryx.only_ad_logins']->fromArray(array(
+    'key' => 'activedirectoryx.only_ad_logins',
+    'value' => false,
+    'xtype' => 'combo-boolean',
+    'namespace' => 'activedirectoryx',
+    'area' => 'ActiveDirectoryX',
+),'',true,true);
+
 $settings['activedirectoryx.autoadd_adgroups']= $modx->newObject('modSystemSetting');
 $settings['activedirectoryx.autoadd_adgroups']->fromArray(array(
     'key' => 'activedirectoryx.autoadd_adgroups',

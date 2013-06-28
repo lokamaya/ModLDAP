@@ -587,7 +587,7 @@ class activeDirectoryXDriver {
             }
         }
 
-        $entries[0]["memberof"]["count"]++;
+//        $entries[0]["memberof"]["count"]++;
 
         return $entries;
     }

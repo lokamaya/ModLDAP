@@ -2,6 +2,7 @@ Changelog for ActiveDirectoryX.
 
 ActiveDirectoryX 2.0.0
 ======================
+- Allow login only from ActiveDirectory (setting only_ad_logins)
 - Forked and refactored to ActiveDirectoryX
 - [#5] Cannot assign by reference to overloaded object
 
