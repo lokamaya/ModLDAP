@@ -24,19 +24,30 @@
  * @package activedirectoryx
  */
 /**
- * Define the MODX path constants necessary for installation
- *
+ * Add events to ActiveDirectoryX plugin
+ * 
  * @package activedirectoryx
  * @subpackage build
  */
-define('MODX_BASE_PATH','/path/to/modx/');
-define('MODX_CORE_PATH', MODX_BASE_PATH . 'core/');
-define('MODX_MANAGER_PATH', MODX_BASE_PATH . 'manager/');
-define('MODX_CONNECTORS_PATH', MODX_BASE_PATH . 'connectors/');
-define('MODX_ASSETS_PATH', MODX_BASE_PATH . 'assets/');
+$events = array();
 
-define('MODX_BASE_URL','/modx/');
-define('MODX_CORE_URL', MODX_BASE_URL . 'core/');
-define('MODX_MANAGER_URL', MODX_BASE_URL . 'manager/');
-define('MODX_CONNECTORS_URL', MODX_BASE_URL . 'connectors/');
-define('MODX_ASSETS_URL', MODX_BASE_URL . 'assets/');
+$events['OnManagerAuthentication']= $modx->newObject('modPluginEvent');
+$events['OnManagerAuthentication']->fromArray(array(
+    'event' => 'OnManagerAuthentication',
+    'priority' => 0,
+    'propertyset' => 0,
+),'',true,true);
+$events['OnWebAuthentication']= $modx->newObject('modPluginEvent');
+$events['OnWebAuthentication']->fromArray(array(
+    'event' => 'OnWebAuthentication',
+    'priority' => 0,
+    'propertyset' => 0,
+),'',true,true);
+$events['OnUserNotFound']= $modx->newObject('modPluginEvent');
+$events['OnUserNotFound']->fromArray(array(
+    'event' => 'OnUserNotFound',
+    'priority' => 0,
+    'propertyset' => 0,
+),'',true,true);
+
+return $events;

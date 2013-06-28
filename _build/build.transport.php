@@ -1,32 +1,32 @@
 <?php
 /**
- * modActiveDirectory
+ * ActiveDirectoryX
  *
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
  *
- * This file is part of modActiveDirectory, which integrates Active Directory
+ * This file is part of ActiveDirectoryX, which integrates Active Directory
  * authentication into MODx Revolution.
  *
- * modActiveDirectory is free software; you can redistribute it and/or modify
+ * ActiveDirectoryX is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option) any
  * later version.
  *
- * modActiveDirectory is distributed in the hope that it will be useful, but
+ * ActiveDirectoryX is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * modActiveDirectory; if not, write to the Free Software Foundation, Inc.,
+ * ActiveDirectoryX; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @package activedirectory
+ * @package activedirectoryx
  */
 /**
- * ActiveDirectory build script
+ * ActiveDirectoryX build script
  *
- * @package activedirectory
+ * @package activedirectoryx
  * @subpackage build
  */
 $mtime = microtime();
@@ -36,10 +36,10 @@ $tstart = $mtime;
 set_time_limit(0);
 
 /* define package */
-define('PKG_NAME','modActiveDirectory');
-define('PKG_NAME_LOWER','activedirectory');
-define('PKG_VERSION','1.0.1');
-define('PKG_RELEASE','pl');
+define('PKG_NAME','ActiveDirectoryX');
+define('PKG_NAME_LOWER','activedirectoryx');
+define('PKG_VERSION','2.0.0');
+define('PKG_RELEASE','beta1');
 
 /* define sources */
 $root = dirname(dirname(__FILE__)).'/';
@@ -80,13 +80,13 @@ $modx->log(modX::LOG_LEVEL_INFO,'Created Transport Package and Namespace.');
 $plugin= $modx->newObject('modPlugin');
 $plugin->fromArray(array(
     'id' => 1,
-    'name' => 'ActiveDirectory',
+    'name' => 'ActiveDirectoryX',
     'description' => '',
-    'plugincode' => getSnippetContent($sources['plugins'] . 'plugin.activedirectory.php'),
+    'plugincode' => getSnippetContent($sources['plugins'] . 'plugin.activedirectoryx.php'),
 ),'',true,true);
-$events = include $sources['data'].'events/events.activedirectory.php';
+$events = include $sources['data'].'events/events.activedirectoryx.php';
 if (is_array($events) && !empty($events)) {
-    $modx->log(modX::LOG_LEVEL_INFO,'Added '.count($events).' events to ActiveDirectory plugin.');
+    $modx->log(modX::LOG_LEVEL_INFO,'Added '.count($events).' events to ActiveDirectoryX plugin.');
     $plugin->addMany($events);
 }
 unset($events);

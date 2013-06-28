@@ -24,19 +24,13 @@
  * @package activedirectoryx
  */
 /**
- * Define the MODX path constants necessary for installation
+ * Loads the home page.
  *
  * @package activedirectoryx
- * @subpackage build
+ * @subpackage controllers
  */
-define('MODX_BASE_PATH','/path/to/modx/');
-define('MODX_CORE_PATH', MODX_BASE_PATH . 'core/');
-define('MODX_MANAGER_PATH', MODX_BASE_PATH . 'manager/');
-define('MODX_CONNECTORS_PATH', MODX_BASE_PATH . 'connectors/');
-define('MODX_ASSETS_PATH', MODX_BASE_PATH . 'assets/');
+$modx->regClientStartupScript($activedirectoryx->config['jsUrl'] . 'mgr/widgets/home.panel.js');
+$modx->regClientStartupScript($activedirectoryx->config['jsUrl'] . 'mgr/sections/home.js');
+$output = '<div id="activedirectoryx-panel-home-div"></div>';
 
-define('MODX_BASE_URL','/modx/');
-define('MODX_CORE_URL', MODX_BASE_URL . 'core/');
-define('MODX_MANAGER_URL', MODX_BASE_URL . 'manager/');
-define('MODX_CONNECTORS_URL', MODX_BASE_URL . 'connectors/');
-define('MODX_ASSETS_URL', MODX_BASE_URL . 'assets/');
+return $output;
