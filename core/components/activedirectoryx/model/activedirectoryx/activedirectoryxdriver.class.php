@@ -177,7 +177,7 @@ class activeDirectoryXDriver {
         $password = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_PASSWORD, '');
         $accountSuffix = $this->getOption(activeDirectoryXDriver::OPT_ACCOUNT_SUFFIX, '@forest.local');
 
-        if (!empty($password) && !empty($password)) {
+        if (!empty($username) && !empty($password)) {
             $this->_bind = @ldap_bind($this->_conn, $username . $accountSuffix, $password);
 
             if (!$this->_bind) {
