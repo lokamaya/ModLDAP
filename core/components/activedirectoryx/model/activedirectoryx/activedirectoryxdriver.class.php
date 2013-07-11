@@ -109,7 +109,7 @@ class activeDirectoryXDriver {
     /**
      * Default Constructor
      *
-     * Tries to bind to the AD domain over LDAP or LDAPs
+     * Tries to bind to the AD domain over LDAP or LDAPS
      *
      * @param modX $modx A reference to the modX object
      * @param array $config Array of options to pass to the constructor
@@ -183,7 +183,7 @@ class activeDirectoryXDriver {
             if (!$this->_bind) {
                 if ($useSsl && !$useTls) {
                     // If you have problems troubleshooting, remove the @ character from the ldap_bind command above to get the actual error message
-                    $this->modx->log(modX::LOG_LEVEL_ERROR, 'Bind to Active Directory failed. Either the LDAPs connection failed or the login credentials are incorrect. AD said: ' . $this->getLastError());
+                    $this->modx->log(modX::LOG_LEVEL_ERROR, 'Bind to Active Directory failed. Either the LDAPS connection failed or the login credentials are incorrect. AD said: ' . $this->getLastError());
                 } else {
                     $this->modx->log(modX::LOG_LEVEL_ERROR, 'Bind to Active Directory failed. Check the login credentials and/or server details. AD said: ' . $this->getLastError());
                 }

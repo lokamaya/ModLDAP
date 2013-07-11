@@ -290,7 +290,7 @@ class adLDAP {
     /**
     * Default Constructor
     *
-    * Tries to bind to the AD domain over LDAP or LDAPs
+    * Tries to bind to the AD domain over LDAP or LDAPS
     *
     * @param array $options Array of options to pass to the constructor
     * @throws Exception - if unable to bind to Domain Controller
@@ -354,7 +354,7 @@ class adLDAP {
             if (!$this->_bind){
                 if ($this->_use_ssl && !$this->_use_tls){
                     // If you have problems troubleshooting, remove the @ character from the ldap_bind command above to get the actual error message
-                    throw new adLDAPException('Bind to Active Directory failed. Either the LDAPs connection failed or the login credentials are incorrect. AD said: ' . $this->get_last_error());
+                    throw new adLDAPException('Bind to Active Directory failed. Either the LDAPS connection failed or the login credentials are incorrect. AD said: ' . $this->get_last_error());
                 } else {
                     throw new adLDAPException('Bind to Active Directory failed. Check the login credentials and/or server details. AD said: ' . $this->get_last_error());
                 }
