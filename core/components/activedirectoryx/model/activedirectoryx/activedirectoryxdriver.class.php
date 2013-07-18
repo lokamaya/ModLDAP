@@ -88,6 +88,7 @@ class activeDirectoryXDriver {
      */
     const OPT_ADMIN_USERNAME = 'activedirectoryx.admin_username';
     const OPT_ADMIN_PASSWORD = 'activedirectoryx.admin_password';
+    const OPT_ADMIN_SUFFIX   = 'activedirectoryx.admin_suffix';
 
     const OPT_LDAP_PROTOCOL_VERSION = 'activedirectoryx.ldap_opt_protocol_version';
     const OPT_LDAP_TIMELIMIT = 'activedirectoryx.ldap_opt_timelimit';
@@ -175,7 +176,7 @@ class activeDirectoryXDriver {
         // Bind as a domain admin if they've set it up
         $username = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_USERNAME, '');
         $password = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_PASSWORD, '');
-        $accountSuffix = $this->getOption(activeDirectoryXDriver::OPT_ACCOUNT_SUFFIX, '@forest.local');
+        $accountSuffix = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_SUFFIX, '');
 
         if (!empty($username) && !empty($password)) {
             $this->_bind = @ldap_bind($this->_conn, $username . $accountSuffix, $password);
@@ -233,10 +234,12 @@ class activeDirectoryXDriver {
         }
 
         /* Once we've checked their details, kick back into admin mode if we have it */
-        $adminPassword = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_PASSWORD);
+        $adminPassword = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_PASSWORD, '');
+        $adminUsername = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_USERNAME, '');
+        $adminSuffix   = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_SUFFIX, '');
 
         if (!empty($adminPassword) && !$preventRebind) {
-            $this->_bind = @ldap_bind($this->_conn, activeDirectoryXDriver::OPT_ADMIN_USERNAME . $accountSuffix, activeDirectoryXDriver::OPT_ADMIN_PASSWORD);
+            $this->_bind = @ldap_bind($this->_conn, $adminUsername . $adminSuffix, $adminPassword);
 
             if (!$this->_bind) {
                 /* This should never happen in theory */

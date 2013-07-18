@@ -61,3 +61,10 @@ $_lang['setting_activedirectoryx.ldap_opt_protocol_version'] = 'LDAP Protocol Ve
 $_lang['setting_activedirectoryx.ldap_opt_protocol_version_desc'] = 'LDAP protocol version to use (V2 or V3)';
 $_lang['setting_activedirectoryx.ldap_opt_ssl_port'] = 'LDAP SSL Port';
 $_lang['setting_activedirectoryx.ldap_opt_ssl_port_desc'] = 'When using SSL, the SSL port to connect to.';
+
+$_lang['setting_activedirectoryx.admin_username'] = 'Admin Username';
+$_lang['setting_activedirectoryx.admin_username_desc'] = 'User name for LDAP admin user with permissions to list all users.';
+$_lang['setting_activedirectoryx.admin_password'] = 'Admin Password';
+$_lang['setting_activedirectoryx.admin_password_desc'] = 'Password for LDAP admin user with permissions to list all users.';
+$_lang['setting_activedirectoryx.admin_suffix'] = 'Admin Suffix';
+$_lang['setting_activedirectoryx.admin_suffix_desc'] = 'The admin account suffix for your domain. Usually in @forest.domain format.';
