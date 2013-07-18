@@ -1,5 +1,9 @@
 Changelog for ActiveDirectoryX.
 
+ActiveDirectoryX 2.1.1
+======================
+- Added admin username, password and suffix settings, for real
+
 ActiveDirectoryX 2.1.0
 ======================
 - Added admin username, password and suffix settings

@@ -163,6 +163,29 @@ $settings['activedirectoryx.ldap_opt_ssl_port']->fromArray(array(
     'namespace' => 'activedirectoryx',
     'area' => 'LDAP',
 ),'',true,true);
-
+$settings['activedirectoryx.admin_username']= $modx->newObject('modSystemSetting');
+$settings['activedirectoryx.admin_username']->fromArray(array(
+        'key' => 'activedirectoryx.admin_username',
+        'value' => '',
+        'xtype' => 'textfield',
+        'namespace' => 'activedirectoryx',
+        'area' => 'LDAP Admin',
+   ),'',true,true);
+$settings['activedirectoryx.admin_password']= $modx->newObject('modSystemSetting');
+$settings['activedirectoryx.admin_password']->fromArray(array(
+        'key' => 'activedirectoryx.admin_password',
+        'value' => '',
+        'xtype' => 'textfield',
+        'namespace' => 'activedirectoryx',
+        'area' => 'LDAP Admin',
+   ),'',true,true);
+$settings['activedirectoryx.admin_suffix']= $modx->newObject('modSystemSetting');
+$settings['activedirectoryx.admin_suffix']->fromArray(array(
+         'key' => 'activedirectoryx.admin_suffix',
+         'value' => '',
+         'xtype' => 'textfield',
+         'namespace' => 'activedirectoryx',
+         'area' => 'LDAP Admin',
+    ),'',true,true);
 
 return $settings;
