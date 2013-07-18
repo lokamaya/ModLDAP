@@ -1,5 +1,9 @@
 Changelog for ActiveDirectoryX.
 
+ActiveDirectoryX 2.1.0
+======================
+- Added admin username, password and suffix settings
+
 ActiveDirectoryX 2.0.0
 ======================
 - Allow login only from ActiveDirectory (setting only_ad_logins)

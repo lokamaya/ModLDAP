@@ -38,7 +38,7 @@ set_time_limit(0);
 /* define package */
 define('PKG_NAME','ActiveDirectoryX');
 define('PKG_NAME_LOWER','activedirectoryx');
-define('PKG_VERSION','2.0.0');
+define('PKG_VERSION','2.1.0');
 define('PKG_RELEASE','beta1');
 
 /* define sources */
