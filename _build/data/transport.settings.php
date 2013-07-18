@@ -179,13 +179,4 @@ $settings['activedirectoryx.admin_password']->fromArray(array(
         'namespace' => 'activedirectoryx',
         'area' => 'LDAP Admin',
    ),'',true,true);
-$settings['activedirectoryx.admin_suffix']= $modx->newObject('modSystemSetting');
-$settings['activedirectoryx.admin_suffix']->fromArray(array(
-         'key' => 'activedirectoryx.admin_suffix',
-         'value' => '',
-         'xtype' => 'textfield',
-         'namespace' => 'activedirectoryx',
-         'area' => 'LDAP Admin',
-    ),'',true,true);
-
 return $settings;

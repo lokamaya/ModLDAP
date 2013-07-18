@@ -80,10 +80,6 @@
             "key": "activedirectoryx.admin_password"
             ,"type": "text-password"
             ,"value": ""
-        },{
-            "key": "activedirectoryx.admin_suffix"
-            ,"type": "textfield"
-            ,"value": ""
         }]
     }
     ,"extensionPackage": {                          
