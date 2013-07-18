@@ -175,7 +175,7 @@ $settings['activedirectoryx.admin_password']= $modx->newObject('modSystemSetting
 $settings['activedirectoryx.admin_password']->fromArray(array(
         'key' => 'activedirectoryx.admin_password',
         'value' => '',
-        'xtype' => 'textfield',
+        'xtype' => 'text-password',
         'namespace' => 'activedirectoryx',
         'area' => 'LDAP Admin',
    ),'',true,true);

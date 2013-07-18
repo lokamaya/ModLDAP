@@ -78,7 +78,7 @@
             ,"value": ""
         },{
             "key": "activedirectoryx.admin_password"
-            ,"type": "textfield"
+            ,"type": "text-password"
             ,"value": ""
         },{
             "key": "activedirectoryx.admin_suffix"
