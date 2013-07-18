@@ -27,7 +27,7 @@
         },{                       
             "key": "base_dn"                      
             ,"type": "textfield"                    
-            ,"value": "value"                   
+            ,"value": ""
         },{                       
             "key": "domain_controllers"                      
             ,"type": "textfield"                    
