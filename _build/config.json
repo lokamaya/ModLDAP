@@ -80,6 +80,10 @@
             "key": "activedirectoryx.admin_password"
             ,"type": "text-password"
             ,"value": ""
+        },{
+            "key": "roles_for_autoadd_usergroups"
+            ,"type": "textfield"
+            ,"value": ""
         }]
     }
     ,"extensionPackage": {                          

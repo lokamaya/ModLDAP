@@ -179,4 +179,12 @@ $settings['activedirectoryx.admin_password']->fromArray(array(
         'namespace' => 'activedirectoryx',
         'area' => 'LDAP Admin',
    ),'',true,true);
+$settings['activedirectoryx.roles_for_autoadd_usergroups']= $modx->newObject('modSystemSetting');
+$settings['activedirectoryx.roles_for_autoadd_usergroups']->fromArray(array(
+        'key' => 'activedirectoryx.roles_for_autoadd_usergroups',
+        'value' => '',
+        'xtype' => 'textfield',
+        'namespace' => 'activedirectoryx',
+        'area' => 'ActiveDirectoryX',
+   ),'',true,true);
 return $settings;

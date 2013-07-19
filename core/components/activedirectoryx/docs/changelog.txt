@@ -1,5 +1,9 @@
 Changelog for ActiveDirectoryX.
 
+ActiveDirectoryX 2.3.0
+======================
+- Added system setting for auto assigning roles to user groups
+
 ActiveDirectoryX 2.2.0
 ======================
 - Removed admin suffix
