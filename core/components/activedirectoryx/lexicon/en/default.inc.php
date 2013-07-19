@@ -66,3 +66,6 @@ $_lang['setting_activedirectoryx.admin_username'] = 'Admin Username';
 $_lang['setting_activedirectoryx.admin_username_desc'] = 'User name for LDAP admin user with permissions to list all users.';
 $_lang['setting_activedirectoryx.admin_password'] = 'Admin Password';
 $_lang['setting_activedirectoryx.admin_password_desc'] = 'Password for LDAP admin user with permissions to list all users.';
+
+$_lang['setting_activedirectoryx.roles_for_autoadd_usergroups'] = 'Auto add roles to user groups';
+$_lang['setting_activedirectoryx.roles_for_autoadd_usergroups_desc'] = 'Comma separated list of roles for user groups. If empty, member role is added. If only 1 role is filled, all user groups will be added with this role. If same count of roles as user groups are added, group will be added with role on same position.';

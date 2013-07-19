@@ -98,8 +98,19 @@ $autoAddUserGroups = $modx->getOption('activedirectoryx.autoadd_usergroups', nul
 if (!empty($autoAddUserGroups)) {
     $autoAddUserGroups = explode(',', $autoAddUserGroups);
 
-    foreach ($autoAddUserGroups as $group) {
-        $group = $modx->getObject('modUserGroup', array('name' => $group));
+    $roles = $modx->getOption('activedirectoryx.roles_for_autoadd_usergroups', null, '');
+    $defaultRole = $modx->getObject('modUserGroupRole', 1);
+    if(!empty($roles)){
+        $roles = explode(',', $roles);
+        $rolesForAllGroups = (count($roles) >= count($autoAddUserGroups));
+    }else{
+        $rolesForAllGroups = false;
+        $roles = array($defaultRole->name);
+    }
+
+
+    foreach ($autoAddUserGroups as $position => $group) {
+        $group = $modx->getObject('modUserGroup', array('name' => trim($group)));
 
         if ($group) {
             $exists = $modx->getObject('modUserGroupMember', array(
@@ -108,10 +119,24 @@ if (!empty($autoAddUserGroups)) {
             ));
 
             if (!$exists) {
+                if($rolesForAllGroups == true){
+                    $role = $modx->getObject('modUserGroupRole', array('name' => trim($roles[$position])));
+
+                    if(!$role){
+                        $role = $modx->getObject('modUserGroupRole', array('name' => $defaultRole->name));
+                    }
+                }else{
+                    $role = $modx->getObject('modUserGroupRole', array('name' => trim($roles[0])));
+
+                    if(!$role){
+                        $role = $modx->getObject('modUserGroupRole', array('name' => $defaultRole->name));
+                    }
+                }
+
                 $membership = $modx->newObject('modUserGroupMember', array(
                     'user_group' => $group->get('id'),
                     'member' => $user->get('id'),
-                    'role' => 1
+                    'role' => $role->id
                 ));
 
                 $membership->save();
