@@ -231,6 +231,26 @@ class activeDirectoryXDriver {
             return false;
         }
 
+        $baseDN = $this->getOption(activeDirectoryXDriver::OPT_BASE_DN, '');
+        if(!empty($baseDN)){
+            $baseDN = str_replace("\n\r", "\n", $baseDN);
+            $baseDN = explode("\n", $baseDN);
+            $found = false;
+
+            foreach($baseDN as $dn){
+                $rec = ldap_search($this->_conn, $dn, 'sAMAccountName=' . $username);
+
+                if (ldap_count_entries($this->_conn, $rec) > 0) {
+                    $found = true;
+                    break;
+                }
+            }
+
+            if(!$found) {
+                return false;
+            }
+        }
+
         /* Once we've checked their details, kick back into admin mode if we have it */
         $adminPassword = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_PASSWORD, '');
         $adminUsername = $this->getOption(activeDirectoryXDriver::OPT_ADMIN_USERNAME, '');
