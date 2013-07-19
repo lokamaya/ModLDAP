@@ -80,7 +80,7 @@ $settings['activedirectoryx.base_dn']= $modx->newObject('modSystemSetting');
 $settings['activedirectoryx.base_dn']->fromArray(array(
     'key' => 'activedirectoryx.base_dn',
     'value' => '',
-    'xtype' => 'textfield',
+    'xtype' => 'textarea',
     'namespace' => 'activedirectoryx',
     'area' => 'ActiveDirectoryX',
 ),'',true,true);

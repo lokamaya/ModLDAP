@@ -1,5 +1,10 @@
 Changelog for ActiveDirectoryX.
 
+ActiveDirectoryX 2.2.0
+======================
+- Removed admin suffix
+- If BaseDN system setting is set, login process wil check if user that is trying to login belongs to one of set baseDNs and if yes, allow him to login
+
 ActiveDirectoryX 2.1.1
 ======================
 - Added admin username, password and suffix settings, for real
