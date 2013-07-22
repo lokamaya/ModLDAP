@@ -207,9 +207,10 @@ class activeDirectoryX {
      * @return boolean
      */
     public function syncProfile(modUserProfile &$profile, $data) {
+        $fullNameField = $this->modx->getOption(activeDirectoryXDriver::OPT_FULL_NAME_FIELD, null, 'displayname');
         /* map of ActiveDirectory => MODx Profile fields */
         $map = array(
-            'name' => 'fullname',
+            $fullNameField => 'fullname',
             'mail' => 'email',
             'streetaddress' => 'address',
             'l' => 'city',
@@ -229,7 +230,6 @@ class activeDirectoryX {
 
             $profile->set($map[$k], $v[0]);
         }
-
         $id = $profile->get('internalKey');
 
         if (!empty($id)) {

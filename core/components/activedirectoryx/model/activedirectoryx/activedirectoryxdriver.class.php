@@ -42,6 +42,8 @@ class activeDirectoryXDriver {
     const FOLDER = 'OU';
     const CONTAINER = 'CN';
 
+    const OPT_FULL_NAME_FIELD = 'activedirectoryx.full_name_field';
+
     /**
      * @var string The account suffix for your domain, can be set when the class is invoked
      */
