@@ -84,6 +84,10 @@
             "key": "roles_for_autoadd_usergroups"
             ,"type": "textfield"
             ,"value": ""
+        },{
+            "key": "full_name_field"
+            ,"type": "textfield"
+            ,"value": "displayname"
         }]
     }
     ,"extensionPackage": {                          

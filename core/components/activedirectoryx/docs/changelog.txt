@@ -1,5 +1,10 @@
 Changelog for ActiveDirectoryX.
 
+ActiveDirectoryX 2.4.0
+======================
+- Added system setting to specify field for full name in user's profile
+
+
 ActiveDirectoryX 2.3.0
 ======================
 - Added system setting for auto assigning roles to user groups

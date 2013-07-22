@@ -187,4 +187,12 @@ $settings['activedirectoryx.roles_for_autoadd_usergroups']->fromArray(array(
         'namespace' => 'activedirectoryx',
         'area' => 'ActiveDirectoryX',
    ),'',true,true);
+$settings['activedirectoryx.full_name_field']= $modx->newObject('modSystemSetting');
+$settings['activedirectoryx.full_name_field']->fromArray(array(
+       'key' => 'activedirectoryx.full_name_field',
+       'value' => 'displayname',
+       'xtype' => 'textfield',
+       'namespace' => 'activedirectoryx',
+       'area' => 'ActiveDirectoryX',
+  ),'',true,true);
 return $settings;
