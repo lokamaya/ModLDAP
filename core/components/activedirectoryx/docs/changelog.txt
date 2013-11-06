@@ -1,0 +1,41 @@
+Changelog for ActiveDirectoryX.
+
+ActiveDirectoryX 2.4.0
+======================
+- Added system setting to specify field for full name in user's profile
+
+
+ActiveDirectoryX 2.3.0
+======================
+- Added system setting for auto assigning roles to user groups
+
+ActiveDirectoryX 2.2.0
+======================
+- Removed admin suffix
+- If BaseDN system setting is set, login process wil check if user that is trying to login belongs to one of set baseDNs and if yes, allow him to login
+
+ActiveDirectoryX 2.1.1
+======================
+- Added admin username, password and suffix settings, for real
+
+ActiveDirectoryX 2.1.0
+======================
+- Added admin username, password and suffix settings
+
+ActiveDirectoryX 2.0.0
+======================
+- Allow login only from ActiveDirectory (setting only_ad_logins)
+- Forked and refactored to ActiveDirectoryX
+- [#5] Cannot assign by reference to overloaded object
+
+ActiveDirectory 1.0.1
+=====================
+- Add more settings for LDAP connectivity
+- [#3] Fix issue with LDAP referrals and incorrect setting
+
+ActiveDirectory 1.0.0
+=====================
+- Add sqlsrv support
+- Add activedirectory.enabled setting, which defaults to 0. Set to 1 to to turn on modActiveDirectory.
+- Fix issue with extension_packages setting, stop patching login.php file since now fixed in Revo
+- Fix issue with logins and empty passwords
