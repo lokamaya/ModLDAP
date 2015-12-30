@@ -1,32 +1,33 @@
 <?php
 /**
- * ActiveDirectoryX
+ * ModLDAP
  *
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ActiveDirectoryX, which integrates Active Directory
+ * This file is part of ModLDAP, which integrates Active Directory
  * authentication into MODx Revolution.
  *
- * ActiveDirectoryX is free software; you can redistribute it and/or modify
+ * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option) any
  * later version.
  *
- * ActiveDirectoryX is distributed in the hope that it will be useful, but
+ * ModLDAP is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * ActiveDirectoryX; if not, write to the Free Software Foundation, Inc.,
+ * ModLDAP; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @package activedirectoryx
+ * @package modldap
  */
 /**
- * ActiveDirectoryX build script
+ * ModLDAP build script
  *
- * @package activedirectoryx
+ * @package modldap
  * @subpackage build
  */
 $mtime = microtime();
@@ -36,10 +37,10 @@ $tstart = $mtime;
 set_time_limit(0);
 
 /* define package */
-define('PKG_NAME','ActiveDirectoryX');
-define('PKG_NAME_LOWER','activedirectoryx');
-define('PKG_VERSION','2.4.0');
-define('PKG_RELEASE','beta1');
+define('PKG_NAME','ModLDAP');
+define('PKG_NAME_LOWER','modldap');
+define('PKG_VERSION','2.4.1');
+define('PKG_RELEASE','alpha');
 
 /* define sources */
 $root = dirname(dirname(__FILE__)).'/';
@@ -53,8 +54,8 @@ $sources = array(
     'plugins' => $root.'core/components/'.PKG_NAME_LOWER.'/elements/plugins/',
     'lexicon' => $root . 'core/components/'.PKG_NAME_LOWER.'/lexicon/',
     'docs' => $root.'core/components/'.PKG_NAME_LOWER.'/docs/',
-    'pages' => $root.'core/components/'.PKG_NAME_LOWER.'/elements/pages/',
-    'source_assets' => $root.'assets/components/'.PKG_NAME_LOWER,
+    //'pages' => $root.'core/components/'.PKG_NAME_LOWER.'/elements/pages/',
+    //'source_assets' => $root.'assets/components/'.PKG_NAME_LOWER,
     'source_core' => $root.'core/components/'.PKG_NAME_LOWER,
 );
 unset($root);
@@ -80,13 +81,13 @@ $modx->log(modX::LOG_LEVEL_INFO,'Created Transport Package and Namespace.');
 $plugin= $modx->newObject('modPlugin');
 $plugin->fromArray(array(
     'id' => 1,
-    'name' => 'ActiveDirectoryX',
+    'name' => 'ModLDAP',
     'description' => '',
-    'plugincode' => getSnippetContent($sources['plugins'] . 'plugin.activedirectoryx.php'),
+    'plugincode' => getSnippetContent($sources['plugins'] . 'plugin.modldap.php'),
 ),'',true,true);
-$events = include $sources['data'].'events/events.activedirectoryx.php';
+$events = include $sources['data'].'events/events.modldap.php';
 if (is_array($events) && !empty($events)) {
-    $modx->log(modX::LOG_LEVEL_INFO,'Added '.count($events).' events to ActiveDirectoryX plugin.');
+    $modx->log(modX::LOG_LEVEL_INFO,'Added '.count($events).' events to ModLDAP plugin.');
     $plugin->addMany($events);
 }
 unset($events);
@@ -105,10 +106,12 @@ $attributes = array (
 );
 $vehicle = $builder->createVehicle($plugin, $attributes);
 $modx->log(modX::LOG_LEVEL_INFO,'Adding file resolvers to plugin...');
+/*
 $vehicle->resolve('file',array(
     'source' => $sources['source_assets'],
     'target' => "return MODX_ASSETS_PATH . 'components/';",
 ));
+*/
 $vehicle->resolve('file',array(
     'source' => $sources['source_core'],
     'target' => "return MODX_CORE_PATH . 'components/';",
@@ -116,10 +119,7 @@ $vehicle->resolve('file',array(
 $vehicle->resolve('php',array(
     'source' => $sources['resolvers'] . 'resolver.extpack.php',
 ));
-/*
-$vehicle->resolve('php',array(
-    'source' => $sources['resolvers'] . 'resolver.patch.php',
-));*/
+
 $builder->putVehicle($vehicle);
 unset($vehicle,$attributes,$plugin);
 

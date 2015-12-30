@@ -1,32 +1,33 @@
 <?php
 /**
- * ActiveDirectoryX
+ * ModLDAP
  *
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ActiveDirectoryX, which integrates Active Directory
+ * This file is part of ModLDAP, which integrates Active Directory
  * authentication into MODx Revolution.
  *
- * ActiveDirectoryX is free software; you can redistribute it and/or modify
+ * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option) any
  * later version.
  *
- * ActiveDirectoryX is distributed in the hope that it will be useful, but
+ * ModLDAP is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * ActiveDirectoryX; if not, write to the Free Software Foundation, Inc.,
+ * ModLDAP; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @package activedirectoryx
+ * @package modldap
  */
 /**
- * Add activedirectoryx package path to extension_packages setting
+ * Add modldap package path to extension_packages setting
  *
- * @package activedirectoryx
+ * @package modldap
  * @subpackage build
  */
 $success = true;
@@ -36,8 +37,8 @@ if ($object->xpdo) {
         case xPDOTransport::ACTION_INSTALL:
         case xPDOTransport::ACTION_UPGRADE:
             $modx =& $object->xpdo;
-            $modelPath = $modx->getOption('activedirectoryx.core_path',null,$modx->getOption('core_path').'components/activedirectoryx/').'model/';
-            //$modx->addPackage('activedirectoryx',$modelPath);
+            $modelPath = $modx->getOption('modldap.core_path',null,$modx->getOption('core_path').'components/modldap/').'model/';
+            //$modx->addPackage('modldap',$modelPath);
 
             $setting = $modx->getObject('modSystemSetting',array(
                 'key' => 'extension_packages',
@@ -56,23 +57,23 @@ if ($object->xpdo) {
 
             if (empty($value)) {
                 $value = array();
-                $value['activedirectoryx'] = array(
-                    'path' => '[[++core_path]]components/activedirectoryx/model/',
+                $value['modldap'] = array(
+                    'path' => '[[++core_path]]components/modldap/model/',
                 );
                 $value = '['.$modx->toJSON($value).']';
             } else {
                 $found = false;
                 foreach ($value as $k => $v) {
                     foreach ($v as $kk => $vv) {
-                        if ($kk == 'activedirectoryx') {
+                        if ($kk == 'modldap') {
                             $found = true;
                         }
                     }
                 }
 
                 if (!$found) {
-                    $value[]['activedirectoryx'] = array(
-                        'path' => '[[++core_path]]components/activedirectoryx/model/',
+                    $value[]['modldap'] = array(
+                        'path' => '[[++core_path]]components/modldap/model/',
                     );
                 }
 
@@ -89,7 +90,7 @@ if ($object->xpdo) {
         /* remove on uninstall */
         case xPDOTransport::ACTION_UNINSTALL:
             $modx =& $object->xpdo;
-            $modelPath = $modx->getOption('activedirectoryx.core_path',null,$modx->getOption('core_path').'components/activedirectoryx/').'model/';
+            $modelPath = $modx->getOption('modldap.core_path',null,$modx->getOption('core_path').'components/modldap/').'model/';
 
             $setting = $modx->getObject('modSystemSetting',array(
                 'key' => 'extension_packages',
@@ -98,7 +99,7 @@ if ($object->xpdo) {
             $value = $setting->get('value');
             $value = $modx->fromJSON($value);
 
-            unset($value['activedirectoryx']);
+            unset($value['modldap']);
 
             $value = $modx->toJSON($value);
 

@@ -1,0 +1,7 @@
+Changelog for ModLDAP.
+
+ModLDAP 2.4.1 alpha
+======================
+- Branched from ActiveDirectoryRedux 2.4.0 beta1
+- Remove unnecessary files/folder
+- Modify some configuration for OpenLDAP
