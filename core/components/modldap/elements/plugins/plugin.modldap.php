@@ -5,7 +5,7 @@
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
  * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates Active Directory
+ * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
@@ -47,10 +47,23 @@ if (!($modLDAPDriver instanceof modLDAPDriver)) {
 
 /* grab correct event processor */
 $eventProcessor = false;
+$continue = true;
 switch ($modx->event->name) {
-    /* authentication */
-    case 'OnWebAuthentication':
+    /* authentication mgr */
     case 'OnManagerAuthentication':
+        $continue = $modx->getOption('modldap.disable_manager', $scriptProperties, false);
+        if (!$continue) {
+            return;
+        }
+        $eventProcessor = 'onauthentication';
+        break;
+        
+    /* authentication context */
+    case 'OnWebAuthentication':
+        $continue = $modx->getOption('modldap.disable_web', $scriptProperties, false);
+        if (!$continue) {
+            return;
+        }
         $eventProcessor = 'onauthentication';
         break;
 
@@ -61,7 +74,7 @@ switch ($modx->event->name) {
 }
 
 /* if found processor, load it */
-if (!empty($eventProcessor)) {
+if ($continue && !empty($eventProcessor)) {
     $eventProcessor = $modldap->config['eventsPath'] . $eventProcessor . '.php';
 
     if (file_exists($eventProcessor)) {

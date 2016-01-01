@@ -5,7 +5,7 @@
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
  * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates Active Directory
+ * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
@@ -55,8 +55,8 @@ class modLDAP {
             'snippetsPath' => $corePath . 'elements/snippets/',
             'processorsPath' => $corePath . 'processors/',
             'hooksPath' => $corePath . 'hooks/',
-            'useCss' => true,
-            'loadJQuery' => true,
+            //'useCss' => true,
+            //'loadJQuery' => true,
         ), $config);
 
         $this->modx->addPackage('modldap', $this->config['modelPath']);
@@ -70,25 +70,27 @@ class modLDAP {
      */
     public function initialize($ctx = 'web') {
         switch ($ctx) {
+            /*
             case 'mgr':
-                if (!$this->modx->loadClass('modldap.request.ADirControllerRequest', $this->config['modelPath'], true, true)) {
+                if (!$this->modx->loadClass('modldap.request.LDAPControllerRequest', $this->config['modelPath'], true, true)) {
                     return 'Could not load controller request handler.';
                 }
 
-                $this->request = new ADirControllerRequest($this);
+                $this->request = new LDAPControllerRequest($this);
 
                 return $this->request->handleRequest();
             break;
 
             case 'connector':
-                if (!$this->modx->loadClass('modldap.request.ADirConnectorRequest', $this->config['modelPath'], true, true)) {
+                if (!$this->modx->loadClass('modldap.request.LDAPConnectorRequest', $this->config['modelPath'], true, true)) {
                     return 'Could not load connector request handler.';
                 }
 
-                $this->request = new ADirConnectorRequest($this);
+                $this->request = new LDAPConnectorRequest($this);
 
                 return $this->request->handle();
             break;
+            */
 
             default:
                 $this->modx->lexicon->load('modldap:web');
@@ -102,7 +104,19 @@ class modLDAP {
         if (!($modldapdriver instanceof modLDAPDriver)) {
             $this->modx->log(modX::LOG_LEVEL_ERROR,'[ModLDAP] Could not load modLDAPDriver class from: ' . $this->config['modelPath']);
 
-            return $modldapdriver; // TODO : remove?
+            return null;
+        }
+
+        return $modldapdriver;
+    }
+
+    public function loadUserHandling() {
+        $modldapuser = $this->modx->getService('modldapuser', 'modLDAPUser', $this->config['modelPath'] . 'modldap/');
+
+        if (!($modldapdriver instanceof modLDAPUser)) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR,'[ModLDAP] Could not load modLDAPUser class from: ' . $this->config['modelPath']);
+
+            return null;
         }
 
         return $modldapdriver;
@@ -195,54 +209,5 @@ class modLDAP {
         $adGroups = array_unique($adGroups);
 
         return $adGroups;
-    }
-
-    /**
-     * Sync the User's Profile with the ActiveDirectory data
-     *
-     * TODO: After Revo 2.0.1, move this to modActiveDirectoryUser. Cant now
-     * because class isnt accessible from onauthenticate
-     * 
-     * @param modUserProfile $profile
-     * @param array $data An array of userinfo data
-     * @return boolean
-     */
-    public function syncProfile(modUserProfile &$profile, $data) {
-        $fullNameField = $this->modx->getOption(modLDAPDriver::OPT_FULL_NAME_FIELD, null, 'displayname');
-        /* map of ActiveDirectory => MODx Profile fields */
-        $map = array(
-            $fullNameField => 'fullname',
-            'mail' => 'email',
-            'streetaddress' => 'address',
-            'l' => 'city',
-            'st' => 'state',
-            'co' => 'country',
-            'postalcode' => 'zip',
-            'mobile' => 'mobilephone',
-            'telephonenumber' => 'phone',
-            'info' => 'comment',
-            'wwwhomepage' => 'website',
-        );
-
-        foreach ($data as $k => $v) {
-            if (!is_array($v) || !array_key_exists($k,$map)) continue;
-
-            $this->modx->log(xPDO::LOG_LEVEL_DEBUG, '[ModLDAP] Syncing field "' . $map[$k] . '" to: "' . $v[0] . '"');
-
-            $profile->set($map[$k], $v[0]);
-        }
-        $id = $profile->get('internalKey');
-
-        if (!empty($id)) {
-            $saved = $profile->save();
-        }
-
-        //$saved = $user->syncProfile($userInfo);
-
-        if (!$saved) {
-            $this->modx->log(modX::LOG_LEVEL_INFO,'[ModLDAP] User Profile information was unable to be synced.');
-        }
-
-        return $saved;
     }
 }

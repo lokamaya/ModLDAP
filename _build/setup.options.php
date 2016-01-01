@@ -4,7 +4,7 @@
  *
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
  *
- * This file is part of ActiveDirectoryX, which integrates Active Directory
+ * This file is part of ActiveDirectoryX, which integrates LDAP
  * authentication into MODx Revolution.
  *
  * ActiveDirectoryX is free software; you can redistribute it and/or modify

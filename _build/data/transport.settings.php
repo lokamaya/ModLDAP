@@ -2,10 +2,9 @@
 /**
  * ModLDAP
  *
- * Copyright 2010 by Shaun McCormick <shaun@modx.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2010 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates Active Directory
+ * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
@@ -32,146 +31,35 @@
  */
 $settings = array();
 
-/*
-$settings['modldap.account_suffix']= $modx->newObject('modSystemSetting');
-$settings['modldap.account_suffix']->fromArray(array(
-    'key' => 'modldap.account_suffix',
-    'value' => '@forest.local',
-    'xtype' => 'textfield',
-    'namespace' => 'modldap',
-    'area' => 'ModLDAP',
-),'',true,true);
-*/
-
+/* LDAP Administration */
 $settings['modldap.enabled']= $modx->newObject('modSystemSetting');
 $settings['modldap.enabled']->fromArray(array(
     'key' => 'modldap.enabled',
     'value' => false,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
-    'area' => 'ModLDAP',
+    'area' => 'LDAPadministration',
 ),'',true,true);
 
 $settings['modldap.disable_manager']= $modx->newObject('modSystemSetting');
 $settings['modldap.disable_manager']->fromArray(array(
     'key' => 'modldap.disable_manager',
-    'value' => true,
+    'value' => false,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
-    'area' => 'ModLDAP',
+    'area' => 'LDAPadministration',
 ),'',true,true);
 
 $settings['modldap.disable_web']= $modx->newObject('modSystemSetting');
 $settings['modldap.disable_web']->fromArray(array(
     'key' => 'modldap.disable_web',
-    'value' => false,
-    'xtype' => 'combo-boolean',
-    'namespace' => 'modldap',
-    'area' => 'ModLDAP',
-),'',true,true);
-
-$settings['modldap.only_ad_logins']= $modx->newObject('modSystemSetting');
-$settings['modldap.only_ad_logins']->fromArray(array(
-    'key' => 'modldap.only_ad_logins',
-    'value' => false,
-    'xtype' => 'combo-boolean',
-    'namespace' => 'modldap',
-    'area' => 'ModLDAP',
-),'',true,true);
-
-/*
-$settings['modldap.real_primarygroup']= $modx->newObject('modSystemSetting');
-$settings['modldap.real_primarygroup']->fromArray(array(
-    'key' => 'modldap.real_primarygroup',
     'value' => true,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
-    'area' => 'ModLDAP',
+    'area' => 'LDAPadministration',
 ),'',true,true);
 
-$settings['modldap.recursive_groups']= $modx->newObject('modSystemSetting');
-$settings['modldap.recursive_groups']->fromArray(array(
-    'key' => 'modldap.recursive_groups',
-    'value' => true,
-    'xtype' => 'combo-boolean',
-    'namespace' => 'modldap',
-    'area' => 'ModLDAP',
-),'',true,true);
-*/
-
-$settings['modldap.admin_username']= $modx->newObject('modSystemSetting');
-$settings['modldap.admin_username']->fromArray(array(
-        'key' => 'modldap.admin_username',
-        'value' => '',
-        'xtype' => 'textfield',
-        'namespace' => 'modldap',
-        'area' => 'LDAPAdmin',
-),'',true,true);
-
-$settings['modldap.admin_password']= $modx->newObject('modSystemSetting');
-$settings['modldap.admin_password']->fromArray(array(
-        'key' => 'modldap.admin_password',
-        'value' => '',
-        'xtype' => 'text-password',
-        'namespace' => 'modldap',
-        'area' => 'LDAPAdmin',
-),'',true,true);
-
-$settings['modldap.add_ldap_user_to_modx']= $modx->newObject('modSystemSetting');
-$settings['modldap.add_ldap_user_to_modx']->fromArray(array(
-    'key' => 'modldap.add_ldap_user_to_modx',
-    'value' => false,
-    'xtype' => 'combo-boolean',
-    'namespace' => 'modldap',
-    'area' => 'ModLDAP',
-),'',true,true);
-
-$settings['modldap.autoadd_usergroups']= $modx->newObject('modSystemSetting');
-$settings['modldap.autoadd_usergroups']->fromArray(array(
-    'key' => 'modldap.autoadd_usergroups',
-    'value' => 'LDAP',
-    'xtype' => 'textfield',
-    'namespace' => 'modldap',
-    'area' => 'LDAPAdmin',
-),'',true,true);
-
-$settings['modldap.roles_for_autoadd_usergroups']= $modx->newObject('modSystemSetting');
-$settings['modldap.roles_for_autoadd_usergroups']->fromArray(array(
-        'key' => 'modldap.roles_for_autoadd_usergroups',
-        'value' => 'Member',
-        'xtype' => 'textfield',
-        'namespace' => 'modldap',
-        'area' => 'LDAPAdmin',
-),'',true,true);
-
-$settings['modldap.maps_fields']= $modx->newObject('modSystemSetting');
-$settings['modldap.maps_fields']->fromArray(array(
-       'key' => 'modldap.maps_fields',
-       'value' => "fullname=givenname\nemail=email\nphone=\nmobilephone=\ndob=\ngender=\naddress=\ncountry=\ncity=\nstate=\nzip=\nfax=\nphoto=\ncomment=\nwebsite=",
-       'xtype' => 'textarea',
-       'namespace' => 'modldap',
-       'area' => 'LDAPAdmin',
-),'',true,true);
-
-$settings['modldap.autoadd_ldap_groups']= $modx->newObject('modSystemSetting');
-$settings['modldap.autoadd_ldap_groups']->fromArray(array(
-    'key' => 'modldap.autoadd_ldap_groups',
-    'value' => true,
-    'xtype' => 'combo-boolean',
-    'namespace' => 'modldap',
-    'area' => 'ModLDAP',
-),'',true,true);
-
-$settings['modldap.autoadd_ldap_regex_groups']= $modx->newObject('modSystemSetting');
-$settings['modldap.autoadd_ldap_regex_groups']->fromArray(array(
-       'key' => 'modldap.autoadd_ldap_regex_groups',
-       'value' => 'cn\=([^,]+).*',
-       'xtype' => 'textfield',
-       'namespace' => 'modldap',
-       'area' => 'LDAPAdmin',
-),'',true,true);
-
-/* LDAP-format */
+/* LDAP Connection */
 $settings['modldap.domain_controllers']= $modx->newObject('modSystemSetting');
 $settings['modldap.domain_controllers']->fromArray(array(
     'key' => 'modldap.domain_controllers',
@@ -195,42 +83,6 @@ $settings['modldap.ssl_port']->fromArray(array(
     'key' => 'modldap.ssl_port',
     'value' => '636',
     'xtype' => 'numberfield',
-    'namespace' => 'modldap',
-    'area' => 'LDAPconnection',
-),'',true,true);
-
-$settings['modldap.format_ldap_bind']= $modx->newObject('modSystemSetting');
-$settings['modldap.format_ldap_bind']->fromArray(array(
-    'key' => 'modldap.format_ldap_bind',
-    'value' => 'uid={username},ou=member,dc=domain,dc=tld',
-    'xtype' => 'textfield',
-    'namespace' => 'modldap',
-    'area' => 'LDAPconnection',
-),'',true,true);
-
-$settings['modldap.format_ldap_search_basedn']= $modx->newObject('modSystemSetting');
-$settings['modldap.format_ldap_search_basedn']->fromArray(array(
-    'key' => 'modldap.format_ldap_search_basedn',
-    'value' => 'dc=domain,dc=tld',
-    'xtype' => 'textfield',
-    'namespace' => 'modldap',
-    'area' => 'LDAPconnection',
-),'',true,true);
-
-$settings['modldap.format_ldap_search_filter']= $modx->newObject('modSystemSetting');
-$settings['modldap.format_ldap_search_filter']->fromArray(array(
-    'key' => 'modldap.format_ldap_search_filter',
-    'value' => '(&(objectClass=person)(uid={username}))',
-    'xtype' => 'textfield',
-    'namespace' => 'modldap',
-    'area' => 'LDAPconnection',
-),'',true,true);
-
-$settings['modldap.format_ldap_search_attributes']= $modx->newObject('modSystemSetting');
-$settings['modldap.format_ldap_search_attributes']->fromArray(array(
-    'key' => 'modldap.format_ldap_search_attributes',
-    'value' => '',
-    'xtype' => 'textfield',
     'namespace' => 'modldap',
     'area' => 'LDAPconnection',
 ),'',true,true);
@@ -280,54 +132,125 @@ $settings['modldap.ldap_opt_debug']->fromArray(array(
     'area' => 'LDAPconnection',
 ),'',true,true);
 
-/*
-$settings['modldap.base_dn']= $modx->newObject('modSystemSetting');
-$settings['modldap.base_dn']->fromArray(array(
-    'key' => 'modldap.base_dn',
-    'value' => '',
-    'xtype' => 'textarea',
+/* LDAP Data */
+$settings['modldap.format_ldap_bind']= $modx->newObject('modSystemSetting');
+$settings['modldap.format_ldap_bind']->fromArray(array(
+    'key' => 'modldap.format_ldap_bind',
+    'value' => 'uid={username},ou=member,dc=domain,dc=tld',
+    'xtype' => 'textfield',
     'namespace' => 'modldap',
-    'area' => 'LDAPconnection',
-),'',true,true);
-*/
-
-/*
-$settings['modldap.ldap_opt_ssl_port']= $modx->newObject('modSystemSetting');
-$settings['modldap.ldap_opt_ssl_port']->fromArray(array(
-    'key' => 'modldap.ldap_opt_ssl_port',
-    'value' => 636,
-    'xtype' => 'numberfield',
-    'namespace' => 'modldap',
-    'area' => 'LDAPconnection',
+    'area' => 'LDAPdata',
 ),'',true,true);
 
-$settings['modldap.ldap_opt_connection_type']= $modx->newObject('modSystemSetting');
-$settings['modldap.ldap_opt_connection_type']->fromArray(array(
-    'key' => 'modldap.ldap_opt_connection_type',
+$settings['modldap.format_ldap_search_basedn']= $modx->newObject('modSystemSetting');
+$settings['modldap.format_ldap_search_basedn']->fromArray(array(
+    'key' => 'modldap.format_ldap_search_basedn',
+    'value' => 'dc=domain,dc=tld',
+    'xtype' => 'textfield',
+    'namespace' => 'modldap',
+    'area' => 'LDAPdata',
+),'',true,true);
+
+$settings['modldap.format_ldap_search_filter']= $modx->newObject('modSystemSetting');
+$settings['modldap.format_ldap_search_filter']->fromArray(array(
+    'key' => 'modldap.format_ldap_search_filter',
+    'value' => '(&(objectClass=person)(uid={username}))',
+    'xtype' => 'textfield',
+    'namespace' => 'modldap',
+    'area' => 'LDAPdata',
+),'',true,true);
+
+$settings['modldap.format_ldap_search_attributes']= $modx->newObject('modSystemSetting');
+$settings['modldap.format_ldap_search_attributes']->fromArray(array(
+    'key' => 'modldap.format_ldap_search_attributes',
     'value' => '',
     'xtype' => 'textfield',
     'namespace' => 'modldap',
-    'area' => 'LDAPconnection',
+    'area' => 'LDAPdata',
 ),'',true,true);
 
-$settings['modldap.use_ssl']= $modx->newObject('modSystemSetting');
-$settings['modldap.use_ssl']->fromArray(array(
-    'key' => 'modldap.use_ssl',
-    'value' => false,
+/* User */
+/*
+$settings['modldap.add_ldap_user_to_modx']= $modx->newObject('modSystemSetting');
+$settings['modldap.add_ldap_user_to_modx']->fromArray(array(
+    'key' => 'modldap.add_ldap_user_to_modx',
+    'value' => true,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
-    'area' => 'LDAPconnection',
-),'',true,true);
-
-$settings['modldap.use_tls']= $modx->newObject('modSystemSetting');
-$settings['modldap.use_tls']->fromArray(array(
-    'key' => 'modldap.use_tls',
-    'value' => false,
-    'xtype' => 'combo-boolean',
-    'namespace' => 'modldap',
-    'area' => 'LDAPconnection',
+    'area' => 'User',
 ),'',true,true);
 */
 
+$settings['modldap.autoadd_usergroups']= $modx->newObject('modSystemSetting');
+$settings['modldap.autoadd_usergroups']->fromArray(array(
+    'key' => 'modldap.autoadd_usergroups',
+    'value' => true,
+    'xtype' => 'combo-boolean',
+    'namespace' => 'modldap',
+    'area' => 'User',
+),'',true,true);
+
+$settings['modldap.autoadd_usergroups_name']= $modx->newObject('modSystemSetting');
+$settings['modldap.autoadd_usergroups_name']->fromArray(array(
+    'key' => 'modldap.autoadd_usergroups_name',
+    'value' => 'LDAP',
+    'xtype' => 'textfield',
+    'namespace' => 'modldap',
+    'area' => 'User',
+),'',true,true);
+
+$settings['modldap.autoadd_usergroups_role']= $modx->newObject('modSystemSetting');
+$settings['modldap.autoadd_usergroups_role']->fromArray(array(
+        'key' => 'modldap.autoadd_usergroups_role',
+        'value' => 'Member',
+        'xtype' => 'textfield',
+        'namespace' => 'modldap',
+        'area' => 'User',
+),'',true,true);
+
+$settings['modldap.maps_fields']= $modx->newObject('modSystemSetting');
+$settings['modldap.maps_fields']->fromArray(array(
+       'key' => 'modldap.maps_fields',
+       'value' => "fullname=cn\nemail=email\nphone=\nmobilephone=\ndob=\ngender=\naddress=\ncountry=\ncity=\nstate=\nzip=\nfax=\nphoto=\ncomment=\nwebsite=",
+       'xtype' => 'textarea',
+       'namespace' => 'modldap',
+       'area' => 'User',
+),'',true,true);
+
+$settings['modldap.ldap_group_add']= $modx->newObject('modSystemSetting');
+$settings['modldap.ldap_group_add']->fromArray(array(
+    'key' => 'modldap.ldap_group_add',
+    'value' => true,
+    'xtype' => 'combo-boolean',
+    'namespace' => 'modldap',
+    'area' => 'User',
+),'',true,true);
+
+$settings['modldap.ldap_group_field']= $modx->newObject('modSystemSetting');
+$settings['modldap.ldap_group_field']->fromArray(array(
+    'key' => 'modldap.ldap_group_field',
+    'value' => true,
+    'xtype' => 'combo-boolean',
+    'namespace' => 'modldap',
+    'area' => 'User',
+),'',true,true);
+
+$settings['modldap.ldap_group_role']= $modx->newObject('modSystemSetting');
+$settings['modldap.ldap_group_role']->fromArray(array(
+       'key' => 'modldap.ldap_group_role',
+       'value' => 'Member',
+       'xtype' => 'textfield',
+       'namespace' => 'modldap',
+       'area' => 'User',
+),'',true,true);
+
+$settings['modldap.format_ldap_groups']= $modx->newObject('modSystemSetting');
+$settings['modldap.format_ldap_groups']->fromArray(array(
+       'key' => 'modldap.format_ldap_groups',
+       'value' => '@cn\=([^,\=]+).*@i',
+       'xtype' => 'textfield',
+       'namespace' => 'modldap',
+       'area' => 'User',
+),'',true,true);
 
 return $settings;

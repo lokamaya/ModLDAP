@@ -5,7 +5,7 @@
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
  * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates Active Directory
+ * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
@@ -23,53 +23,35 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  * @package modldap
- */
+**/
 /**
  * Handles OnUserNotFound event
  *
  * @package modldap
- */
+**/
+
 $scriptProperties = $modx->event->params;
+$modx->event->_output = false;
 
 if (empty($scriptProperties['username'])) return;
 
-$modx->event->_output = false;
-
-$username = is_object($scriptProperties['user']) && $scriptProperties['user'] instanceof modUser ? $scriptProperties['user']->get('username') : $scriptProperties['username'];
-
 /* connect to active directory */
-$connected = $modLDAPDriver->connect();
-if (!$connected) {
-    $modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP] Could not connect via LDAP to Active Directory.');
+if ( !($modLDAPDriver->connect()) ) {
+    $modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP:EventOnUserNotFound] Could not connect to LDAP.');
     $modx->event->output(false);
     return;
 }
 
 /* authenticate the user */
-if ($modLDAPDriver->authenticate($username, $scriptProperties['password'])) {
-    $user =& $scriptProperties['user']; // TODO : remove?
-    $user = $modx->getObject('modLDAPUser', array('username' => $username));
-
-    if (empty($user)) {
-        $user = $modx->newObject('modLDAPUser');
-        $user->set('username', $username);
-        $user->set('active', true);
-        $user->save();
-
-        $profile = $modx->newObject('modUserProfile');
-        $profile->set('internalKey', $user->get('id'));
-        $profile->save();
-
-        $user->Profile = $profile;
-    } else {
-        $user->getOne('Profile');
-    }
-
-    $modx->event->_output = $user;
-    $modx->event->stopPropagation();
+if ( !($modLDAPDriver->authenticate($scriptProperties['username'], $scriptProperties['password'])) ) {
+    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:EventOnUserNotFound] Could not authenticate user: "' . $username . '" with password "*****".');
+    $modx->event->output(false);
     return;
 }
 
-$modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP] Could not authenticate user: "' . $username . '" with password "' . $scriptProperties['password'] . '".');
-$modx->event->_output = false;
+$user = $modx->newObject('modLDAPUser');
+$user->syncLDAP($scriptProperties, $modLDAPDriver->getLdapEntries(), true);
+
+$modx->event->_output = $user;
+$modx->event->stopPropagation();
 return;

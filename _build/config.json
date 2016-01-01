@@ -1,9 +1,9 @@
 {
-    "name": "ActiveDirectoryX"
-    ,"lowCaseName": "activedirectoryx"
+    "name": "ModLDAP"
+    ,"lowCaseName": "modldap"
     ,"description": "Package description"
-    ,"author": "Author name"                       
-    ,"version": "2.2.0 beta1"
+    ,"author": "Zaenal Muttaqin"                       
+    ,"version": "2.4.1 alpha"
     ,"package":{                                    
         "elements": {                              
             "plugins": [{                           
@@ -17,7 +17,7 @@
             ,"type": "textfield"                    
             ,"value": "@ttu.local"                   
         },{                       
-            "key": "autoadd_adgroups"                      
+            "key": "autoadd_ldap_groups"                      
             ,"type": "combo-boolean"                    
             ,"value": "1"                   
         },{                       

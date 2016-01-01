@@ -5,7 +5,7 @@
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
  * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates Active Directory
+ * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
@@ -23,155 +23,76 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  * @package modldap
- */
+**/
 /**
  * Authenticates the user and syncs profile data via On*Authentication events
  * 
  * @package modldap
- */
+**/
+
 $scriptProperties = $modx->event->params;
+$modx->event->_output = false;
+$success = false;
 
 if (empty($scriptProperties['user']) || !is_object($scriptProperties['user'])) {
     $modx->event->output(false);
     return;
 }
 
-$classKey = $scriptProperties['user']->get('class_key');
-
-/* authenticate the user */
-$success = false;
-$user =& $scriptProperties['user'];
-
-if (!is_object($user) || !($user instanceof modUser)) {
-    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP] The user specified is not a valid modUser.');
+/* if not an modUser */
+if (!is_object($scriptProperties['user']) || !($scriptProperties['user'] instanceof modUser)) {
+    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:EventOnAuthentication] The user specified is not a valid modUser.');
     $modx->event->output(false);
     return;
 }
 
-/* if not an AD user, skip */
-if ($user->get('class_key') != 'modLDAPUser') {
-    $username = is_object($user) ? $user->get('username') : $user;
-    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP] User "' . $username . '" is not a modLDAPUser and therefore is being skipped.');
-
-    if ($modx->getOption('modldap.only_ad_logins', null, false)) {
-        $user->set('password', '');
+/* if not an modLDAPUser, skip */
+if ( ($scriptProperties['user'] instanceof modUser) || ($scriptProperties['user'] instanceof modLDAPUser) ) {
+    if (($scriptProperties['user']->get('class_key') == 'modLDAPUser') ) {
+        if (!($scriptProperties['user'] instanceof modLDAPUser)) {
+            $scriptProperties['user'] = $modx->getObject('modLDAPUser', array('username' => $scriptProperties['username']));
+        }
+    } else {
+        $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:EventOnAuthentication] User "' . $scriptProperties['user']->get('username') . '" is not a modLDAPUser and therefore is being skipped.');
+        //$modx->event->output(false);
+        return;
     }
-
+} else {
+    $modx->event->output(false);
     return;
 }
+
+/* authenticate the user */
+$user = $scriptProperties['user'];
 
 $username = $user->get('username');
 $password = $scriptProperties['password'];
 
+if (empty($username) || empty($password)) {
+    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:EventOnAuthentication] username or password was empty!');
+    $modx->event->output(false);
+    return;
+}
+
 /* connect to modldap */
-$connected = $modLDAPDriver->connect();
-if (!$connected) {
-    $modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP] Could not connect via LDAP to Active Directory.');
-    $modx->event->output(false);
-    return;
-}
-/* attempt to authenticate */
-if (!($modLDAPDriver->authenticate($username,$password))) {
-    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP] Failed to authenticate "' . $username . '" with password "' . $password . '"');
+if ( !($modLDAPDriver->connect()) ) {
+    $modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP:EventOnAuthentication] Could not connect to LDAP.');
     $modx->event->output(false);
     return;
 }
 
-/* get user info */
-$userData = $modLDAPDriver->userInfo($username);
-if (!empty($userData) && !empty($userData[0])) {
-    $userData = $userData[0];
+/* authenticate the user */
+$authenticated = ;
+if ( !($modLDAPDriver->authenticate($username, $password)) ) {
+    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:EventOnAuthentication] Could not authenticate user: "' . $username . '" with password "*****".');
+    $modx->event->output(false);
+    return;
 }
 
-/* setup profile data */
-if (!empty($userData) && $user instanceof modLDAPUser) {
-    $profile = $user->getOne('Profile');
+$user->syncLDAP($scriptProperties, $modLDAPDriver->getLdapEntries(), false);
 
-    if (!empty($profile)) {
-        $modldap->syncProfile($profile, $userData);
-    }
-}
+$scriptProperties['user'] = $user;
 
-/* TODO: add ability to auto-setup user settings here */
-
-/* always auto-add users to these groups */
-$autoAddUserGroups = $modx->getOption('modldap.autoadd_usergroups', null, '');
-if (!empty($autoAddUserGroups)) {
-    $autoAddUserGroups = explode(',', $autoAddUserGroups);
-
-    $roles = $modx->getOption('modldap.roles_for_autoadd_usergroups', null, '');
-    $defaultRole = $modx->getObject('modUserGroupRole', 1);
-    if(!empty($roles)){
-        $roles = explode(',', $roles);
-        $rolesForAllGroups = (count($roles) >= count($autoAddUserGroups));
-    }else{
-        $rolesForAllGroups = false;
-        $roles = array($defaultRole->name);
-    }
-
-
-    foreach ($autoAddUserGroups as $position => $group) {
-        $group = $modx->getObject('modUserGroup', array('name' => trim($group)));
-
-        if ($group) {
-            $exists = $modx->getObject('modUserGroupMember', array(
-                'user_group' => $group->get('id'),
-                'member' => $user->get('id')
-            ));
-
-            if (!$exists) {
-                if($rolesForAllGroups == true){
-                    $role = $modx->getObject('modUserGroupRole', array('name' => trim($roles[$position])));
-
-                    if(!$role){
-                        $role = $modx->getObject('modUserGroupRole', array('name' => $defaultRole->name));
-                    }
-                }else{
-                    $role = $modx->getObject('modUserGroupRole', array('name' => trim($roles[0])));
-
-                    if(!$role){
-                        $role = $modx->getObject('modUserGroupRole', array('name' => $defaultRole->name));
-                    }
-                }
-
-                $membership = $modx->newObject('modUserGroupMember', array(
-                    'user_group' => $group->get('id'),
-                    'member' => $user->get('id'),
-                    'role' => $role->id
-                ));
-
-                $membership->save();
-            }
-        }
-    }
-}
-
-/* if true, auto-add users to AD groups that exist as MODx groups */
-$autoAddAdGroups = $modx->getOption('modldap.autoadd_adgroups', null, true);
-if (!empty($autoAddAdGroups) && !empty($userData)) {
-    $adGroups = $modldap->getGroupsFromInfo($userData);
-
-    foreach ($adGroups as $group) {
-        $group = $modx->getObject('modUserGroup', array('name' => $group));
-
-        if ($group) {
-            $exists = $modx->getObject('modUserGroupMember', array(
-                'user_group' => $group->get('id'),
-                'member' => $user->get('id')
-            ));
-
-            if (!$exists) {
-                $membership = $modx->newObject('modUserGroupMember', array(
-                    'user_group' => $group->get('id'),
-                    'member' => $user->get('id'),
-                    'role' => 1
-                ));
-
-                $membership->save();
-            }
-        }
-    }
-}
-
+$modx->event->output(true);
 $modx->event->_output = true;
 return;

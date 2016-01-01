@@ -2,10 +2,9 @@
 /**
  * ModLDAP
  *
- * Copyright 2010 by Shaun McCormick <shaun@modx.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2010 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates Active Directory
+ * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify

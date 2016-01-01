@@ -1,32 +1,33 @@
 <?php
 /**
- * ActiveDirectoryX
+ * ModLDAP
  *
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ActiveDirectoryX, which integrates Active Directory
+ * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
  *
- * ActiveDirectoryX is free software; you can redistribute it and/or modify
+ * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option) any
  * later version.
  *
- * ActiveDirectoryX is distributed in the hope that it will be useful, but
+ * ModLDAP is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * ActiveDirectoryX; if not, write to the Free Software Foundation, Inc.,
+ * ModLDAP; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @package activedirectoryx
+ * @package modldap
  */
 /**
  * Define the MODX path constants necessary for installation
  *
- * @package activedirectoryx
+ * @package modldap
  * @subpackage build
  */
 define('MODX_BASE_PATH','/path/to/modx/');
