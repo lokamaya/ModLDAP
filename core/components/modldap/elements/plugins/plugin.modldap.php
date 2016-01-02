@@ -51,7 +51,7 @@ $continue = true;
 switch ($modx->event->name) {
     /* authentication mgr */
     case 'OnManagerAuthentication':
-        $continue = $modx->getOption('modldap.disable_manager', $scriptProperties, false);
+        $continue = $modx->getOption('modldap.login_manager_disable', $scriptProperties, false);
         if (!$continue) {
             return;
         }
@@ -60,7 +60,7 @@ switch ($modx->event->name) {
         
     /* authentication context */
     case 'OnWebAuthentication':
-        $continue = $modx->getOption('modldap.disable_web', $scriptProperties, false);
+        $continue = $modx->getOption('modldap.login_web_disable', $scriptProperties, false);
         if (!$continue) {
             return;
         }

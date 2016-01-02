@@ -2,8 +2,7 @@
 /**
  * ModLDAP
  *
- * Copyright 2010 by Shaun McCormick <shaun@modx.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
  * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
@@ -44,11 +43,6 @@ $sources = array(
     'root' => $root,
     'core' => $root.'core/components/'.PKG_NAME_LOWER.'/',
     'model' => $root.'core/components/'.PKG_NAME_LOWER.'/model/',
-    'schema' => $root.'core/components/'.PKG_NAME_LOWER.'/schema/',
-    'schema_file' => array(
-        $root.'core/components/'.PKG_NAME_LOWER.'/schema/modldap.mysql.schema.xml',
-        $root.'core/components/'.PKG_NAME_LOWER.'/schema/modldap.sqlsrv.schema.xml',
-        ),
     //'assets' => $root.'assets/components/'.PKG_NAME_LOWER.'/',
 );
 
@@ -64,30 +58,122 @@ echo '<pre>'; /* used for nice formatting of log messages */
 $modx->setLogLevel(modX::LOG_LEVEL_INFO);
 $modx->setLogTarget('ECHO');
 
-$manager= $xpdo->getManager();
-$generator= $manager->getGenerator();
+foreach (array('mysql', 'sqlsrv') as $driver) {
+    $xpdo= new xPDO(
+        $properties["{$driver}_string_dsn_nodb"],
+        $properties["{$driver}_string_username"],
+        $properties["{$driver}_string_password"],
+        $properties["{$driver}_array_options"],
+        $properties["{$driver}_array_driverOptions"]
+    );
+    $xpdo->setPackage('modx', dirname(XPDO_CORE_PATH) . '/model/');
+    $xpdo->setDebug(true);
 
-if (!is_dir($sources['model'])) {
-    $modx->log(modX::LOG_LEVEL_ERROR,'Model directory not found!');
-    die();
-}
+    $manager= $xpdo->getManager();
+    $generator= $manager->getGenerator();
 
-foreach($sources['schema_file'] as $schema) {
-    if (!file_exists($schema)) {
-        $modx->log(modX::LOG_LEVEL_ERROR,'Schema file not found!');
-        $modx->log(modX::LOG_LEVEL_ERROR,'Schema file: ' . $schema);
-        die();
-    }
-    $generator->parseSchema($schema,$sources['model']);
-}
+    $manager= $xpdo->getManager();
+    $generator= $manager->getGenerator();
 
-if (!is_dir($sources['model'])) {
-    $modx->log(modX::LOG_LEVEL_ERROR,'Model directory not found!');
-    die();
-}
-if (!file_exists($sources['schema_file'])) {
-    $modx->log(modX::LOG_LEVEL_ERROR,'Schema file not found!');
-    die();
+$generator->classTemplate= <<<EOD
+<?php
+/**
+ * ModLDAP
+ *
+ * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ *
+ * This file is part of ModLDAP, which integrates LDAP
+ * authentication into MODx Revolution.
+ *
+ * ModLDAP is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option) any
+ * later version.
+ *
+ * ModLDAP is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ModLDAP; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package modldap
+ */
+/**
+ * [+phpdoc-package+]
+ */
+class [+class+] extends [+extends+] {}
+?>
+EOD;
+$generator->platformTemplate= <<<EOD
+<?php
+/**
+ * ModLDAP
+ *
+ * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ *
+ * This file is part of ModLDAP, which integrates LDAP
+ * authentication into MODx Revolution.
+ *
+ * ModLDAP is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option) any
+ * later version.
+ *
+ * ModLDAP is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ModLDAP; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package modldap
+ */
+/**
+ * [+phpdoc-package+]
+ */
+require_once (strtr(realpath(dirname(dirname(__FILE__))), '\\\\', '/') . '/[+class-lowercase+].class.php');
+class [+class+]_[+platform+] extends [+class+] {}
+?>
+EOD;
+$generator->mapHeader= <<<EOD
+<?php
+/**
+ * ModLDAP
+ *
+ * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ *
+ * This file is part of ModLDAP, which integrates LDAP
+ * authentication into MODx Revolution.
+ *
+ * ModLDAP is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option) any
+ * later version.
+ *
+ * ModLDAP is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ModLDAP; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * @package modldap
+ */
+/**
+ * [+phpdoc-package+]
+ */
+EOD;
+    $generator->parseSchema($sources['model'] . 'schema/'.PKG_NAME_LOWER.'.'.$driver.'.schema.xml', $sources['model']);
 }
 
 $mtime= microtime();

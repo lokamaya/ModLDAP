@@ -31,12 +31,12 @@
 $_lang['modldap'] = 'ModLDAP';
 
 /* Administration */
-$_lang['setting_modldap.enabled'] = 'Enabled/Disable LDAP';
+$_lang['setting_modldap.enabled'] = 'LDAP Enabled';
 $_lang['setting_modldap.enabled_desc'] = 'When set to Yes, enables the ModLDAP SSO integration. If set to No, will be using default MODx users.';
-$_lang['setting_modldap.disable_manager'] = 'Disable LDAP for Manager';
-$_lang['setting_modldap.disable_manager_desc'] = 'Enable/Disable LDAP for Manager context.';
-$_lang['setting_modldap.disable_web'] = 'Disable LDAP for Website';
-$_lang['setting_modldap.disable_web_desc'] = 'Enable/Disable LDAP for others context.';
+$_lang['setting_modldap.login_manager_disable'] = 'Disable LDAP for Manager';
+$_lang['setting_modldap.login_manager_disable_desc'] = 'Disable LDAP for Manager context.';
+$_lang['setting_modldap.login_web_disable'] = 'Disable LDAP for Website';
+$_lang['setting_modldap.login_web_disable_desc'] = 'Disable LDAP for others context.';
 
 /* Connection */
 $_lang['setting_modldap.domain_controllers'] = 'Domain Controllers';
@@ -59,7 +59,7 @@ $_lang['setting_modldap.ldap_opt_debug_desc'] = 'Enable/disable debug. 0=disable
 
 /* Data */
 $_lang['setting_modldap.format_ldap_bind'] = 'Bind Format';
-$_lang['setting_modldap.format_ldap_bind_desc'] = 'Some LDAP required specific format, such as: "{username}@domain.tld" or "uid:{username},dc=domain.tld" or simply "{username}". See <a href="http://php.net/manual/en/function.ldap-bind.php" target="_blank">http://php.net/manual/en/function.ldap-bind.php</a>.';
+$_lang['setting_modldap.format_ldap_bind_desc'] = 'Some LDAP required specific format, such as: "%username%@domain.tld" or simply "%username%" (%username% will be replaced by username, %password% will be replaced by password) See <a href="http://php.net/manual/en/function.ldap-bind.php" target="_blank">http://php.net/manual/en/function.ldap-bind.php</a>.';
 $_lang['setting_modldap.format_ldap_search_basedn'] = 'Search Format: BaseDN';
 $_lang['setting_modldap.format_ldap_search_basedn_desc'] = 'Search LDAP tree using BaseDN. See <a href="http://php.net/manual/en/function.ldap-search.php" target="_blank">http://php.net/manual/en/function.ldap-search.php</a>.';
 $_lang['setting_modldap.format_ldap_search_filter'] = 'Search Format: Filter';

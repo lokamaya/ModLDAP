@@ -41,18 +41,18 @@ $settings['modldap.enabled']->fromArray(array(
     'area' => 'LDAPadministration',
 ),'',true,true);
 
-$settings['modldap.disable_manager']= $modx->newObject('modSystemSetting');
-$settings['modldap.disable_manager']->fromArray(array(
-    'key' => 'modldap.disable_manager',
+$settings['modldap.login_manager_disable']= $modx->newObject('modSystemSetting');
+$settings['modldap.login_manager_disable']->fromArray(array(
+    'key' => 'modldap.login_manager_disable',
     'value' => false,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
     'area' => 'LDAPadministration',
 ),'',true,true);
 
-$settings['modldap.disable_web']= $modx->newObject('modSystemSetting');
-$settings['modldap.disable_web']->fromArray(array(
-    'key' => 'modldap.disable_web',
+$settings['modldap.login_web_disable']= $modx->newObject('modSystemSetting');
+$settings['modldap.login_web_disable']->fromArray(array(
+    'key' => 'modldap.login_web_disable',
     'value' => true,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
@@ -72,7 +72,7 @@ $settings['modldap.domain_controllers']->fromArray(array(
 $settings['modldap.connection_type']= $modx->newObject('modSystemSetting');
 $settings['modldap.connection_type']->fromArray(array(
     'key' => 'modldap.connection_type',
-    'value' => 'localhost',
+    'value' => '',
     'xtype' => 'textfield',
     'namespace' => 'modldap',
     'area' => 'LDAPconnection',
@@ -136,7 +136,7 @@ $settings['modldap.ldap_opt_debug']->fromArray(array(
 $settings['modldap.format_ldap_bind']= $modx->newObject('modSystemSetting');
 $settings['modldap.format_ldap_bind']->fromArray(array(
     'key' => 'modldap.format_ldap_bind',
-    'value' => 'uid={username},ou=member,dc=domain,dc=tld',
+    'value' => 'uid=%username%,ou=member,dc=domain,dc=tld',
     'xtype' => 'textfield',
     'namespace' => 'modldap',
     'area' => 'LDAPdata',
@@ -154,7 +154,7 @@ $settings['modldap.format_ldap_search_basedn']->fromArray(array(
 $settings['modldap.format_ldap_search_filter']= $modx->newObject('modSystemSetting');
 $settings['modldap.format_ldap_search_filter']->fromArray(array(
     'key' => 'modldap.format_ldap_search_filter',
-    'value' => '(&(objectClass=person)(uid={username}))',
+    'value' => '(&(objectClass=person)(uid=%username%))',
     'xtype' => 'textfield',
     'namespace' => 'modldap',
     'area' => 'LDAPdata',

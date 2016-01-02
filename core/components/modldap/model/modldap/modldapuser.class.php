@@ -29,8 +29,9 @@
 class modLDAPUser extends modUser {
     function __construct(xPDO & $xpdo) {
         parent :: __construct($xpdo);
-
         $this->set('class_key', 'modLDAPUser');
+        
+        $this->xpdo->log(xPDO::LOG_LEVEL_DEBUG, '[ModLDAP:User] Initializing...');
     }
 
     /**
@@ -42,7 +43,7 @@ class modLDAPUser extends modUser {
     **/
     public function syncLDAP(&$scriptProperties, $entries, $notfound=true) {
         $user = null;
-        $sync = true; //$this->modx->getOption('modldap.add_ldap_user_to_modx', false);
+        $sync = true; //$this->xpdo->getOption('modldap.add_ldap_user_to_modx', false);
         if ($sync) {
             if ($notfound) {
                 $this->set('username', $scriptProperties['username']);
@@ -76,7 +77,7 @@ class modLDAPUser extends modUser {
     **/
     private function syncProfile($entries, $noprofile=true) {
         if ((empty($this->Profile)) || ($this->Profile  instanceof modUserProfile)) {
-            $this->Profile = $this->modx->newObject('modUserProfile');
+            $this->Profile = $this->xpdo->newObject('modUserProfile');
             $this->Profile->set('internalKey', $this->get('id'));
         }
         
@@ -85,7 +86,7 @@ class modLDAPUser extends modUser {
             if (!is_array($v) || !array_key_exists($k,$map) || empty($v[0])) continue;
             $this->Profile->set($map[$k], $v[0]);
         }
-        $this->modx->log(xPDO::LOG_LEVEL_INFO, '[ModLDAP:User] Syncing user profile...');
+        $this->xpdo->log(xPDO::LOG_LEVEL_INFO, '[ModLDAP:User] Syncing user profile...');
         $this->Profile->save();
     }
     
@@ -165,7 +166,7 @@ class modLDAPUser extends modUser {
      */
     private function mapsLdapFields($data) {
         $maps = array();
-        $maps_fields = $this->modx->getOption('modldap.maps_fields', null, null);
+        $maps_fields = $this->xpdo->getOption('modldap.maps_fields', null, null);
         
         if (empty($data) || empty($maps_fields)) {
             return $maps;

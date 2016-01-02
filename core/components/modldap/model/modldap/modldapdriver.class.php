@@ -140,6 +140,10 @@ class modLDAPDriver {
         return $this->modx->getOption($k, $this->config, $return);
     }
 
+    public function is_connected() {
+        return $this->_conn;
+    }
+    
     /**
     * Connects and Binds to the Domain Controller
     *
@@ -147,15 +151,12 @@ class modLDAPDriver {
     */
     public function connect() {
         $debug_level = $this->getOption(modLDAPDriver::OPT_DEBUG_LEVEL, 0);
-        $connection_type = $this->getOption(modLDAPDriver::OPT_CONNECTION_TYPE, '', 'NORMAL');
+        $connection_type = $this->getOption(modLDAPDriver::OPT_CONNECTION_TYPE, 'NORMAL');
         $connection_port = (int)$this->getOption(modLDAPDriver::OPT_LDAP_SSL_PORT, 636);
         
         if ($debug_level > 0) {
             ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, $debug_level);
         }
-
-        $useSsl = $this->getOption(modLDAPDriver::OPT_USE_SSL, false);
-        $useTls = $this->getOption(modLDAPDriver::OPT_USE_TLS, false);
         
         // Connect to the AD/LDAP server as the username/password
         $dc = $this->getRandomController();
@@ -211,31 +212,42 @@ class modLDAPDriver {
     * @return bool
     **/
     public function authenticate($username, $password, $preventRebind = false){
+        if (!($this->is_connected())) {
+            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connection not available. Authentication fail!');
+            return false;
+        }
+        
         $found = false;
         if (empty($username) || empty($password)) {
-            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Username or Password is empty!');
+            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Username or Password is empty!' . "$username - $password");
             return $found;
         }
 
         // Bind as the user
-        $remote_key = $this->parseBindUsername($username);
+        $remote_key    = $this->parseBindUsername($username, $password);
         $remote_basedn = array_unique($this->parseSearchBaseDN($username));
         $remote_filter = array_unique($this->parseSearchFilter($username));
+        
+        //print_r($remote_basedn);
+        //die();
         
         $this->_bind = @ldap_bind($this->_conn, $remote_key, $password);
 
         if (!$this->_bind) {
-            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Username or Password not match!');
+            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Username or Password not match!' . "$remote_key - $username");
             return $found;
         }
+        
+        //$this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] ' . serialize($remote_basedn));
+        //$this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] ' . serialize($remote_filter));
         
         foreach ($remote_basedn as $basedn) {
             foreach ($remote_filter as $filter) {
                 $basedn = trim($basedn);
                 $filter = trim($filter);
-                $this->_search = ldap_search($this->_conn, $basedn, $filter);
+                $this->_search = @ldap_search($this->_conn, $basedn, $filter);
                 
-                if ($this->_search && ldap_count_entries($this->_conn, $this->_search) > 0) {
+                if (($this->_search) && ldap_count_entries($this->_conn, $this->_search) > 0) {
                     $found = true;
                     
                     $this->_remotekey = $remote_key;
@@ -243,6 +255,8 @@ class modLDAPDriver {
                     $this->_filter = $filter;
                     
                     break;
+                } else {
+                    $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] ' . $this->getLastError() . " for ''ldap_search($basedn, $filter)'' ");
                 }
             }
             if ($found) break;
@@ -274,10 +288,10 @@ class modLDAPDriver {
     *
     * @return string
     */
-    private function parseBindUsername($username) {
+    private function parseBindUsername($username, $password) {
         $format = $this->getOption(modLDAPDriver::FORMAT_LDAP_BIND, $username);
         
-        return str_replace('{username}', $username, $format);
+        return str_replace(array('%username%', '%password%'), array($username, $password), $format);
     }
 
     /**
@@ -288,8 +302,9 @@ class modLDAPDriver {
     private function parseSearchBaseDN($username) {
         $baseDn = $this->findBaseDn();
         $format = $this->getOption(modLDAPDriver::FORMAT_LDAP_SEARCH_BASEDN, $baseDn);
+        $format = str_replace('%username%', $username, $format);
         
-        return preg_split("/[\n\r]+/", str_replace('{username}', $username, $format));
+        return preg_split("/[\n\r]+/", $format);
     }
     
     /**
@@ -299,8 +314,8 @@ class modLDAPDriver {
     */
     private function parseSearchFilter($username) {
         $format = $this->getOption(modLDAPDriver::FORMAT_LDAP_SEARCH_FILTER, $username);
-        
-        return preg_split("/[\n\r]+/", str_replace('{username}', $username, $format));
+        $format = str_replace('%username%', $username, $format);
+        return preg_split("/[\n\r]+/", $format);
     }
 
 

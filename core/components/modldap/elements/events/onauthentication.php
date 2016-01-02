@@ -2,8 +2,7 @@
 /**
  * ModLDAP
  *
- * Copyright 2010 by Shaun McCormick <shaun@modx.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
  * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
@@ -32,67 +31,50 @@
 
 $scriptProperties = $modx->event->params;
 $modx->event->_output = false;
-$success = false;
 
 if (empty($scriptProperties['user']) || !is_object($scriptProperties['user'])) {
     $modx->event->output(false);
     return;
 }
 
-/* if not an modUser */
-if (!is_object($scriptProperties['user']) || !($scriptProperties['user'] instanceof modUser)) {
-    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:EventOnAuthentication] The user specified is not a valid modUser.');
-    $modx->event->output(false);
-    return;
-}
-
-/* if not an modLDAPUser, skip */
-if ( ($scriptProperties['user'] instanceof modUser) || ($scriptProperties['user'] instanceof modLDAPUser) ) {
-    if (($scriptProperties['user']->get('class_key') == 'modLDAPUser') ) {
-        if (!($scriptProperties['user'] instanceof modLDAPUser)) {
-            $scriptProperties['user'] = $modx->getObject('modLDAPUser', array('username' => $scriptProperties['username']));
-        }
-    } else {
-        $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:EventOnAuthentication] User "' . $scriptProperties['user']->get('username') . '" is not a modLDAPUser and therefore is being skipped.');
-        //$modx->event->output(false);
-        return;
-    }
-} else {
-    $modx->event->output(false);
-    return;
-}
+$classKey = $scriptProperties['user']->get('class_key');
 
 /* authenticate the user */
-$user = $scriptProperties['user'];
+$success = false;
+$user =& $scriptProperties['user'];
+
+if (!is_object($user) || !($user instanceof modUser)) {
+    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP] The user specified is not a valid modUser.');
+    $modx->event->output(false);
+    return;
+}
+
+/* if not an LDAP user, skip */
+if ($user->get('class_key') != 'modLDAPUser') {
+    $username = is_object($user) ? $user->get('username') : $user;
+    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP] User "' . $username . '" is not a modLDAPUser and therefore is being skipped.');
+
+    return;
+}
 
 $username = $user->get('username');
 $password = $scriptProperties['password'];
 
-if (empty($username) || empty($password)) {
-    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:EventOnAuthentication] username or password was empty!');
-    $modx->event->output(false);
-    return;
-}
-
 /* connect to modldap */
-if ( !($modLDAPDriver->connect()) ) {
-    $modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP:EventOnAuthentication] Could not connect to LDAP.');
+$connected = $modLDAPDriver->connect();
+if (!$connected) {
+    $modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP] Could not connect via LDAP to Active Directory.');
+    $modx->event->output(false);
+    return;
+}
+/* attempt to authenticate */
+if (!($modLDAPDriver->authenticate($username,$password))) {
+    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP] Failed to authenticate "' . $username . '" with password "' . $password . '"');
     $modx->event->output(false);
     return;
 }
 
-/* authenticate the user */
-$authenticated = ;
-if ( !($modLDAPDriver->authenticate($username, $password)) ) {
-    $modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:EventOnAuthentication] Could not authenticate user: "' . $username . '" with password "*****".');
-    $modx->event->output(false);
-    return;
-}
+$modLDAPUser->syncLDAP($scriptProperties, $modLDAPDriver->getLdapEntries(), false);
 
-$user->syncLDAP($scriptProperties, $modLDAPDriver->getLdapEntries(), false);
-
-$scriptProperties['user'] = $user;
-
-$modx->event->output(true);
 $modx->event->_output = true;
 return;
