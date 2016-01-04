@@ -24,7 +24,7 @@
  * @package modldap
  */
 /**
- * Default English language file for OpenLDAP
+ * Default Indonesia language file for OpenLDAP
  *
  * @package modldap
  */
