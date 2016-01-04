@@ -11,7 +11,7 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 
 // Only you can view this page!!!
 if (!isset($_GET[$_securityARG]) || $_GET[$_securityARG] !== $_securityVAL || $_securityVAL == 'secretword' || empty($_securityVAL)) {
-    if ($_tpl = file_get_contents('debug.html')) {
+    if ($_tpl = file_get_contents('_debug.html')) {
         echo $_tpl;
     } else {
         header('HTTP/1.0 403 Forbidden');
