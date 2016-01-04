@@ -2,10 +2,11 @@
 /**
  * ModLDAP
  *
- * Copyright 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2010 by Shaun McCormick <shaun@modx.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates LDAP
- * authentication into MODx Revolution.
+ * This file is part of ModLDAP, which integrates LDAP authentication
+ * into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
@@ -59,7 +60,13 @@ $modx->setLogLevel(modX::LOG_LEVEL_INFO);
 $modx->setLogTarget('ECHO');
 
 foreach (array('mysql', 'sqlsrv') as $driver) {
-    $xpdo= new xPDO();
+    $xpdo= new xPDO(
+        $properties["{$driver}_string_dsn_nodb"],
+        $properties["{$driver}_string_username"],
+        $properties["{$driver}_string_password"],
+        $properties["{$driver}_array_options"],
+        $properties["{$driver}_array_driverOptions"]
+    );
     $xpdo->setPackage('modx', dirname(XPDO_CORE_PATH) . '/model/');
     $xpdo->setDebug(true);
 
