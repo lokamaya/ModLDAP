@@ -2,11 +2,10 @@
 /**
  * ModLDAP
  *
- * Copyright 2010 by Shaun McCormick <shaun@modx.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates LDAP
- * authentication into MODx Revolution.
+ * This file is part of ModLDAP, which integrates LDAP authentication
+ * into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
@@ -30,91 +29,226 @@
  * @package modldap
  */
 class modLDAP {
+    const MODLDAP_MODLDAP = 'ModLDAP';                                          // ModLDAP
+    const MODLDAP_MODLDAPUSER = 'modLDAPUser';                                  // modLDAPUser
+    const MODLDAP_MODLDAPDRIVER = 'modLDAPDriver';                              // modLDAPDriver
     
+    // Administration
+    const MODLDAP_ENABLED = 'modldap.enabled';                                  // LDAP Enabled
+    const LOGIN_MANAGER_DISABLE = 'modldap.login_manager_disable';              // Disable LDAP for Manager
+    const LOGIN_WEB_DISABLE = 'modldap.login_web_disable';                      // Disable LDAP for Website
+    const UPDATE_LDAP = 'modldap.update_ldap';                                  // Enabled Update to LDAP
+    
+    // Network
+    const DOMAIN_CONTROLLERS = 'modldap.domain_controllers';                    // Domain Controllers
+    const CONNECTION_TYPE = 'modldap.connection_type';                          // LDAP Connection Type
+    const SSL_PORT = 'modldap.ssl_port';                                        // LDAP SSL Port
+    const LDAP_OPT_PROTOCOL_VERSION = 'modldap.ldap_opt_protocol_version';      // LDAP Protocol Version
+    const LDAP_OPT_REFERRALS = 'modldap.ldap_opt_referrals';                    // Follow LDAP Referrals
+    const LDAP_OPT_NETWORK_TIMEOUT = 'modldap.ldap_opt_network_timeout';        // LDAP Network Timeout
+    const LDAP_OPT_TIMELIMIT = 'modldap.ldap_opt_timelimit';                    // LDAP Timeout Limit
+    const LDAP_OPT_DEBUG = 'modldap.ldap_opt_debug';                            // LDAP Debug
+    
+    // format 
+    const FORMAT_LDAP_BIND = 'modldap.format_ldap_bind';                        // Bind Format
+    const FORMAT_LDAP_SEARCH_BASEDN = 'modldap.format_ldap_search_basedn';      // Search Format: BaseDN
+    const FORMAT_LDAP_SEARCH_FILTER = 'modldap.format_ldap_search_filter';      // Search Format: Filter
+    const FORMAT_LDAP_GROUPS = 'modldap.format_ldap_groups';                    // LDAP Group(s) regex
+    
+    // AUTOADD LDAP Group
+    const AUTOADD_USERGROUPS = 'modldap.autoadd_usergroups';                    // Auto Add MODx UserGroup
+    const AUTOADD_USERGROUPS_NAME = 'modldap.autoadd_usergroups_name';          // Default MODx UserGroup
+    const AUTOADD_USERGROUPS_ROLE = 'modldap.autoadd_usergroups_role';          // Auto add MODx roles to User Groups
+    
+    // AUTOADD MODx Group
+    const LDAP_GROUP_ADD = 'modldap.ldap_group_add';                            // Auto-Add LDAP Groups to MODx
+    const LDAP_GROUP_FIELD = 'modldap.ldap_group_field';                        // LDAP Group Field
+    const LDAP_GROUP_ROLE = 'modldap.ldap_group_role';                          // Role for LDAP groups
+    
+    // MODx => LDAP : fields maps
+    const FIELD_FULLNAME = 'modldap.field_fullname';                            // LDAP Field: Fullname
+    const FIELD_EMAIL = 'modldap.field_email';                                  // LDAP Field: Email
+    const FIELD_PHONE = 'modldap.field_phone';                                  // LDAP Field: Phone
+    const FIELD_MOBILEPHONE = 'modldap.field_mobilephone';                      // LDAP Field: Mobilephone
+    const FIELD_DOB = 'modldap.field_dob';                                      // LDAP Field: Dob
+    const FIELD_GENDER = 'modldap.field_gender';                                // LDAP Field: Gender
+    const FIELD_ADDRESS = 'modldap.field_address';                              // LDAP Field: Address
+    const FIELD_COUNTRY = 'modldap.field_country';                              // LDAP Field: Country
+    const FIELD_CITY = 'modldap.field_city';                                    // LDAP Field: City
+    const FIELD_STATE = 'modldap.field_state';                                  // LDAP Field: State
+    const FIELD_ZIP = 'modldap.field_zip';                                      // LDAP Field: Zip
+    const FIELD_FAX = 'modldap.field_fax';                                      // LDAP Field: Fax
+    const FIELD_PHOTO = 'modldap.field_photo';                                  // LDAP Field: Photo
+    const FIELD_COMMENT = 'modldap.field_comment';                              // LDAP Field: Comment
+    const FIELD_WEBSITE = 'modldap.field_website';                              // LDAP Field: Website
+    const FIELD_MEMBEROF = 'modldap.field_memberof';                            // LDAP Field: Group or MemberOf
+    
+    // Photo path and url
+    const PHOTO_PATH = 'modldap.photo_path';                                    // Base Photo Path
+    const PHOTO_URL = 'modldap.photo_url';                                      // Base Photo URL
+
     function __construct(modX &$modx, array $config = array()) {
         $this->modx =& $modx;
 
-        $corePath = $this->modx->getOption('modldap.core_path', $config,$this->modx->getOption('core_path') . 'components/modldap/');
-        $assetsPath = $this->modx->getOption('modldap.assets_path', $config,$this->modx->getOption('assets_path') . 'components/modldap/');
-        $assetsUrl = $this->modx->getOption('modldap.assets_url', $config,$this->modx->getOption('assets_url') . 'components/modldap/');
-        $connectorUrl = $assetsUrl . 'connector.php';
+        $corePath       = $this->modx->getOption('modldap.core_path', $config,$this->modx->getOption('core_path') . 'components/modldap/');
+        $assetsPath     = $this->modx->getOption('modldap.assets_path', $config,$this->modx->getOption('assets_path') . 'components/modldap/');
+        $assetsUrl      = $this->modx->getOption('modldap.assets_url', $config,$this->modx->getOption('assets_url') . 'components/modldap/');
+        $photoPath      = $this->modx->getOption('modldap.photo_path', $config,$this->modx->getOption('assets_path') . 'components/modldap/');
+        $photoUrl       = $this->modx->getOption('modldap.photo_url', $config,$this->modx->getOption('assets_url') . 'components/modldap/');
+        $connectorUrl   = $assetsUrl . 'connector.php';
 
         $this->config = array_merge(array(
-            //'assetsUrl' => $assetsUrl,
-            //'cssUrl' => $assetsUrl . 'css/',
-            //'jsUrl' => $assetsUrl . 'js/',
-            //'imagesUrl' => $assetsUrl . 'images/',
+            'corePath'      => $corePath,
+            'assetsUrl'     => $assetsUrl,
+            'photoPath'     => $photoPath,
+            'photoUrl'      => $photoUrl,
+            'connectorUrl'  => $connectorUrl,
 
-            'connectorUrl' => $connectorUrl,
-
-            'corePath' => $corePath,
-            'modelPath' => $corePath . 'model/',
-            'chunksPath' => $corePath . 'elements/chunks/',
-            'pagesPath' => $corePath . 'elements/pages/',
-            'eventsPath' => $corePath . 'elements/events/',
-            'snippetsPath' => $corePath . 'elements/snippets/',
-            'processorsPath' => $corePath . 'processors/',
-            'hooksPath' => $corePath . 'hooks/',
-            //'useCss' => true,
-            //'loadJQuery' => true,
+            'corePath'          => $corePath,
+            'modelPath'         => $corePath . 'model/',
+            'chunksPath'        => $corePath . 'elements/chunks/',
+            'pagesPath'         => $corePath . 'elements/pages/',
+            'eventsPath'        => $corePath . 'elements/events/',
+            'snippetsPath'      => $corePath . 'elements/snippets/',
+            'processorsPath'    => $corePath . 'processors/',
+            'hooksPath'         => $corePath . 'hooks/',
         ), $config);
-
+        
+        //debug//
+        //$this->modx->log(modX::LOG_LEVEL_INFO, '[modLDAP] Conctructing and loading packages...');
         $this->modx->addPackage('modldap', $this->config['modelPath']);
     }
+    
+    /********************************
+     * Plugin Processing           *
+    ********************************/
+    /**
+     * process OnUserNotFound
+     *
+     * @access public
+     * @param string $scriptProperties 
+     * @return vary
+    **/
+    public function processOnUserNotFound() {
+        $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:processOnUserNotFound] Processing...');
+        
+        $scriptProperties = $this->modx->event->params;
+        $this->modx->event->_output = false;
+        
+        if (empty($scriptProperties['username'])) return;
+        
+        $user = $this->modx->newObject('modLDAPUser');
+        if ( !($user->Driver->authenticate($scriptProperties['username'], $scriptProperties['password'])) ) {
+            $this->modx->event->output(false);
+            return;
+        }
+        $this->set('username', $scriptProperties['username']);
+        $user = $user->createUserFromLDAP($user->Driver->getLdapEntries());
+        $this->modx->event->_output = $user;
+        $this->modx->event->stopPropagation();
 
+        return;
+    }
+    
+    /**
+     * process OnManagerAuthentication
+     *
+     * @access public
+     * @param string $scriptProperties 
+     * @return vary
+    **/
+    public function processOnManagerAuthentication() {
+        $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:processOnAuthentication] Processing...');
+        
+        $scriptProperties = $this->modx->event->params;
+        $this->modx->event->_output = false;
+
+        if (empty($scriptProperties['user']) || !is_object($scriptProperties['user'])) {
+            $this->modx->event->output(false);
+            return;
+        }
+
+        $classKey = $scriptProperties['user']->get('class_key');
+
+        /* authenticate the user */
+        $user = $scriptProperties['user'];
+
+        /* if not a valid modUser, skip */
+        if (!is_object($user) || !($user instanceof modUser)) {
+            $this->modx->event->output(false);
+            return;
+        }
+
+        $username = $user->get('username');
+        $password = $scriptProperties['password'];
+
+        /* if not a modLDAPUser, skip */
+        if ($user->get('class_key') != 'modLDAPUser') {
+            $this->modx->event->output(false);
+            return;
+        } 
+
+        /* double check: if not a modLDAPUser object but valid modUser object, recreate $user */
+        if (!($user instanceof modLDAPUser) && $classKey == 'modLDAPUser') {
+            $username = $user->get('username');
+            $user = $this->modx->newObject('modLDAPUser', array('username'=>$username));
+        }
+
+        /* attempt to authenticate */
+        if (!($user->Driver->authenticate($username,$password))) {
+            $this->modx->event->output(false);
+            return;
+        }
+
+        /* modLDAPUser: update user profile from LDAP entries */
+        $user = $user->updateUserFromLDAP($user->Driver->getLdapEntries());
+
+        $scriptProperties['user'] = $user;
+        $this->modx->event->params = $scriptProperties;
+        $this->modx->event->output(true);
+        $this->modx->event->_output = true;
+
+        return;
+    }
+    
+    /**
+     * process OnWebAuthentication
+     *
+     * @access public
+     * @param string $scriptProperties 
+     * @return vary
+    **/
+    public function processOnWebAuthentication() {
+        //$this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:processOnManagerAuthentication] Processing...');
+        return $this->processOnManagerAuthentication();
+    }
+    
+    
+    /********************************
+     * Utility                     *
+    ********************************/
     /**
      * Initializes ModLDAP into different contexts.
      *
      * @access public
      * @param string $ctx The context to load. Defaults to web.
-     */
+    **/
     public function initialize($ctx = 'web') {
-        switch ($ctx) {
-            /*
-            case 'mgr':
-                if (!$this->modx->loadClass('modldap.request.LDAPControllerRequest', $this->config['modelPath'], true, true)) {
-                    return 'Could not load controller request handler.';
-                }
-
-                $this->request = new LDAPControllerRequest($this);
-
-                return $this->request->handleRequest();
-            break;
-
-            case 'connector':
-                if (!$this->modx->loadClass('modldap.request.LDAPConnectorRequest', $this->config['modelPath'], true, true)) {
-                    return 'Could not load connector request handler.';
-                }
-
-                $this->request = new LDAPConnectorRequest($this);
-
-                return $this->request->handle();
-            break;
-            */
-
-            default:
-                $this->modx->lexicon->load('modldap:web');
-            break;
-        }
+        //not implemented
     }
 
+    /**
+     * Initializes modLDAPDriver
+     *
+     * @access public
+     * @return object modLDAPDriver
+    **/
     public function loadDriver() {
+        $this->modx->log(modX::LOG_LEVEL_INFO, '[modLDAP] Loading modLDAPDriver...');
         $modldapdriver = $this->modx->getService('modldapdriver', 'modLDAPDriver', $this->config['modelPath'] . 'modldap/');
 
         if (!($modldapdriver instanceof modLDAPDriver)) {
             $this->modx->log(modX::LOG_LEVEL_ERROR,'[ModLDAP] Could not load modLDAPDriver class from: ' . $this->config['modelPath']);
-
-            return null;
-        }
-
-        return $modldapdriver;
-    }
-
-    public function loadUserHandling() {
-        $modldapuser = $this->modx->getService('modldapuser', 'modLDAPUser', $this->config['modelPath'] . 'modldap/');
-
-        if (!($modldapdriver instanceof modLDAPUser)) {
-            $this->modx->log(modX::LOG_LEVEL_ERROR,'[ModLDAP] Could not load modLDAPUser class from: ' . $this->config['modelPath']);
 
             return null;
         }
@@ -181,33 +315,26 @@ class modLDAP {
 
         return $chunk;
     }
-
-    public function getGroupsFromInfo($data) {
-        if (empty($data['memberof'])) {
-            return array();
-        }
+    
+    /**
+     * generateCallTrace function for debugging purpose
+     * 
+     * @return string formated
+     * false.
+     */
+    public function generateCallTrace() {
+        $e = new Exception();
+        $trace = explode("\n", $e->getTraceAsString());
+        // reverse array to make steps line up chronologically
+        $trace = array_reverse($trace);
+        array_shift($trace); // remove {main}
+        array_pop($trace); // remove call to this method
+        $length = count($trace);
+        $result = array();
         
-        $groupStrings = $data['memberof'];
-        $adGroups = array();
-
-        foreach ($groupStrings as $k => $groupString) {
-            if (!is_int($k)) continue;
-
-            $groupData = explode(',', $groupString);
-
-            foreach ($groupData as $groupDataRecord) {
-                if (strpos($groupDataRecord, 'CN=') === false && strpos($groupDataRecord, 'cn=') === false) continue;
-
-                $groupDataRecord = str_replace(array('CN=', 'cn='), '', $groupDataRecord);
-
-                if (!empty($groupDataRecord)) {
-                    $adGroups[] = $groupDataRecord;
-                }
-            }
+        for ($i = 0; $i < $length; $i++) {
+            $result[] = ($i + 1)  . ')' . substr($trace[$i], strpos($trace[$i], ' ')); // replace '#someNum' with '$i)', set the right ordering
         }
-
-        $adGroups = array_unique($adGroups);
-
-        return $adGroups;
+        return "\t" . implode("\n\t", $result);
     }
 }
