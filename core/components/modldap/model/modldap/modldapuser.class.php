@@ -4,8 +4,8 @@
  *
  * Copyright 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates LDAP
- * authentication into MODx Revolution.
+ * This file is part of ModLDAP, which integrates LDAP authentication
+ * into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
@@ -27,34 +27,26 @@
  * @package modldap
  */
 class modLDAPUser extends modUser {
-    const OPT_DEBUG_LEVEL = 'modldap.ldap_opt_debug';                       // 0=disable, 7=debug
-    const OPT_DOMAIN_CONTROLLERS = 'modldap.domain_controllers';            // LDAP Host. Default: localhost
-    
-    const LDAP_GROUP_ADD     = 'modldap.ldap_group_add';                    // enable/disable: add ldap groups to ldap user
-    const LDAP_GROUP_FIELD   = 'modldap.ldap_group_field';                  // default: memberof
-    const LDAP_GROUP_ROLE    = 'modldap.ldap_group_role';                   // this group role
-    const FORMAT_LDAP_GROUPS = 'modldap.format_ldap_groups';                // regex to get ldap group
-    
-    const AUTOADD_USERGROUPS      = 'modldap.autoadd_usergroups';           // enable/disable: add modx group to ldap user
-    const AUTOADD_USERGROUPS_NAME = 'modldap.autoadd_usergroups_name';      // modx group for ldap. default: LDAD
-    const AUTOADD_USERGROUPS_ROLE = 'modldap.autoadd_usergroups_role';      // this group role
-    
-    const PHOTO_PATH = 'modldap.photo_path';
-    const PHOTO_URL  = 'modldap.photo_url';
-    
-    const MAPS_FIELDS = 'modldap.maps_fields';
-    
     protected $ldap_remote_key;
     protected $ldap_entries;
     protected $ldap_entries_blob;
     protected $ldap_fields_map;
     
+    public $Driver;
+    
     function __construct(xPDO & $xpdo) {
         parent :: __construct($xpdo);
+        
         $this->set('class_key', 'modLDAPUser');
+        $modLDAP = $this->xpdo->getService('modldap', 'modLDAP', $this->xpdo->getOption('modldap.core_path', null, $this->xpdo->getOption('core_path') . 'components/modldap/') . 'model/modldap/');
+        
+        if ($this->xpdo->getOption(modLDAP::MODLDAP_ENABLED, false)) {
+            $this->Driver = $modLDAP->loadDriver();
+        }
+        
         $this->ldap_fields_map = $this->ldapFieldsOption();
         
-        $this->xpdo->log(xPDO::LOG_LEVEL_DEBUG, '[ModLDAP:User] Initializing...');
+        $this->xpdo->log(xPDO::LOG_LEVEL_DEBUG, '[ModLDAP:User] Initialized!');
     }
 
     /**
@@ -65,7 +57,7 @@ class modLDAPUser extends modUser {
     * @param string $password
     * @return void
     **/
-    public function syncFromLDAP($entries, $username=null, $password='') {
+    public function createUserFromLDAP($entries) {
         $this->ldap_remote_key = $entries['remote_key'];
         
         // Sometime data is too big, especially if LDAP return image blob.
@@ -74,7 +66,7 @@ class modLDAPUser extends modUser {
         $this->ldap_entries = $this->cleanupLdapEntries($entries['result']);
         unset($entries); 
         
-        if ($username) { //NEW USER
+        //if ($username) { //NEW USER
             $this->set('username', $username);
             $this->set('class_key', 'modLDAPUser');
             //do not add password, so modLDAP will always authenticates through LDAP driver
@@ -86,12 +78,46 @@ class modLDAPUser extends modUser {
             $this->set('active', true);
             
             if ($this->save()) {
-                $this->syncProfileFromLDAP(true);
+                $this->syncProfileFromLDAP();
+                $this->syncGroupFromLDAP();
             }
-        } else { //OLD USER
+        //}
+        return $this;
+    }
+    
+    /**
+    * Sync from LDAP to MODx
+    * 
+    * @param array $entries
+    * @param string $username
+    * @param string $password
+    * @return void
+    **/
+    public function updateUserFromLDAP($entries) {
+        $this->ldap_remote_key = $entries['remote_key'];
+        
+        // Sometime data is too big, especially if LDAP return image blob.
+        // And we dont want to store binnary/string photo from LDAP to MySQL
+        // blob/image/binnary moved to $this->ldap_entries_blob
+        $this->ldap_entries = $this->cleanupLdapEntries($entries['result']);
+        unset($entries); 
+        
+        $old_remote_data = unserialize($this->get('remote_data'));
+        $new_remote_data = $this->ldap_entries;
+
+        if ($old_remote_data != $new_remote_data) {
             $this->getOne('Profile');
-            $this->syncProfileFromLDAP(false);
+            
+            if ($this->syncProfileFromLDAP() !== false) {
+                $this->set('remote_key', $this->ldap_remote_key);
+                $this->set('remote_data', serialize($this->ldap_entries));
+                $this->save();
+                
+                $this->syncGroupFromLDAP();
+            }
         }
+        
+        return $this;
     }
     
     /**
@@ -111,32 +137,16 @@ class modLDAPUser extends modUser {
     * 
     * @return void
     **/
-    public function syncProfileFromLDAP($new = false) {
-        if ($new || empty($this->Profile) || !($this->Profile instanceof modUserProfile)) {
-            $new = 2;
+    public function syncProfileFromLDAP() {
+        if (empty($this->Profile) || !($this->Profile instanceof modUserProfile)) {
             $this->Profile = $this->xpdo->newObject('modUserProfile');
             $this->Profile->set('internalKey', $this->get('id'));
         }
         
-        $old_extended = unserialize($this->get('remote_data'));
-        $new_extended = $this->ldap_entries;
+        $host = explode(',',$this->xpdo->getOption(modLDAP::DOMAIN_CONTROLLERS, 'localhost'))[0];
         
-        $this->Profile->set('fullname', $this->getOneLdapEntry('fullname', $this->get('username')));
-        $this->Profile->set('email',    $this->getOneLdapEntry('email',    $this->get('username') . '@' . $this->xpdo->getOption(modLDAPUser::OPT_DOMAIN_CONTROLLERS, 'localhost')));
-        
-        //check if there are no modification to ldap entries
-        if ($old_extended == $new_extended) {
-            if ($new === true || $new === 1) {
-                @$this->Profile->save();
-            }
-            
-            return;
-        } else if ($new === 2) {
-            $this->set('remote_key', $this->ldap_remote_key);
-            $this->set('remote_data', serialize($this->ldap_entries));
-            $this->save();
-        }
-        
+        $this->Profile->set('fullname',     $this->getOneLdapEntry('fullname', $this->get('username')));
+        $this->Profile->set('email',        $this->getOneLdapEntry('email',    $this->get('username') . '@' . $host));
         $this->Profile->set('phone',        $this->getOneLdapEntry('phone'));
         $this->Profile->set('mobilephone',  $this->getOneLdapEntry('mobilephone'));
         $this->Profile->set('dob',          $this->getOneLdapEntry('dob'));
@@ -149,12 +159,11 @@ class modLDAPUser extends modUser {
         $this->Profile->set('fax',          $this->getOneLdapEntry('fax'));
         $this->Profile->set('comment',      $this->getOneLdapEntry('comment'));
         $this->Profile->set('website',      $this->getOneLdapEntry('website'));
-        //photo
+        
+        //photo: we handle it differently
         $this->Profile->set('photo',        $this->getOneLdapEntryPhoto('photo'));
         
-        @$this->Profile->save();
-        $this->xpdo->log(xPDO::LOG_LEVEL_DEBUG, '[ModLDAP:User] Syncronizing profile...');
-        return;
+        return $this->Profile->save();
     }
     
     /**
@@ -165,14 +174,15 @@ class modLDAPUser extends modUser {
     * @return void
     **/
     public function syncGroupFromLDAP() {
-        $ldap_group_add  = $this->getOption(modLDAPUser::LDAP_GROUP_ADD, false);
+        return;
+        $ldap_group_add  = $this->getOption(modLDAP::LDAP_GROUP_ADD, false);
         $ldap_group  = array();
-        $ldap_roles  = trim($this->getOption(modLDAPUser::LDAP_GROUP_ROLE, 'Member'));
+        $ldap_roles  = trim($this->getOption(modLDAP::LDAP_GROUP_ROLE, 'Member'));
         
         
-        $modx_group_add  = $this->getOption(modLDAPUser::AUTOADD_USERGROUPS, false);
-        $modx_group_name = $this->getOption(modLDAPUser::AUTOADD_USERGROUPS_NAME, 'LDAP');
-        $modx_group_role = $this->getOption(modLDAPUser::AUTOADD_USERGROUPS_ROLE, 'Member');
+        $modx_group_add  = $this->getOption(modLDAP::AUTOADD_USERGROUPS, false);
+        $modx_group_name = $this->getOption(modLDAP::AUTOADD_USERGROUPS_NAME, 'LDAP');
+        $modx_group_role = $this->getOption(modLDAP::AUTOADD_USERGROUPS_ROLE, 'Member');
         
         if ($ldap_group_add) {
             $ldap_group = $this->parseLdapGroups($entries);
@@ -203,8 +213,8 @@ class modLDAPUser extends modUser {
     * @return string
     */
     private function parseLdapGroups($entries) {
-        $ldap_field  = trim($this->getOption(modLDAPUser::LDAP_GROUP_FIELD, 'memberof'));
-        $ldap_regex  = $this->getOption(modLDAPUser::FORMAT_LDAP_GROUPS, '');
+        $ldap_field  = trim($this->getOption(modLDAP::LDAP_GROUP_FIELD, 'memberof'));
+        $ldap_regex  = $this->getOption(modLDAP::FORMAT_LDAP_GROUPS, '');
         
         $groups_ldap = array();
         
@@ -284,8 +294,8 @@ class modLDAPUser extends modUser {
         }
         
         if ($_image) {
-            $assetsPath = $this->modx->getOption(modLDAPUser::PHOTO_PATH, $config,$this->modx->getOption('assets_path') . 'components/modldap/');
-            $assetsUrl  = $this->modx->getOption(modLDAPUser::PHOTO_URL, $config,$this->modx->getOption('assets_url') . 'components/modldap/');
+            $assetsPath = $this->modx->getOption(modLDAP::PHOTO_PATH, $config,$this->modx->getOption('assets_path') . 'components/modldap/');
+            $assetsUrl  = $this->modx->getOption(modLDAP::PHOTO_URL, $config,$this->modx->getOption('assets_url') . 'components/modldap/');
             $imageName  = $this->get('username') . '-' . $this->get('id') . '.jpg';
             
             if (is_string($_image) === true && ctype_print($_image) === false) {
@@ -414,24 +424,24 @@ class modLDAPUser extends modUser {
      */
     private function ldapFieldsOption() {
         $fields = array(
-            'fullname'       => $this->getOption('modldap.field_fullname', 'cn'),
-            'email'          => $this->getOption('modldap.field_email', 'email'),
-            'phone'          => $this->getOption('modldap.field_phone', ''),
-            'mobilephone'    => $this->getOption('modldap.field_mobilephone', ''),
-            'dob'            => $this->getOption('modldap.field_dob', ''),
-            'gender'         => $this->getOption('modldap.field_gender', ''),
-            'address'        => $this->getOption('modldap.field_address', ''),
-            'country'        => $this->getOption('modldap.field_country', ''),
-            'city'           => $this->getOption('modldap.field_city', ''),
-            'state'          => $this->getOption('modldap.field_state', ''),
-            'zip'            => $this->getOption('modldap.field_zip', ''),
-            'fax'            => $this->getOption('modldap.field_fax', ''),
-            'photo'          => $this->getOption('modldap.field_photo', ''),
-            'comment'        => $this->getOption('modldap.field_comment', ''),
-            'website'        => $this->getOption('modldap.field_website', ''),
-            'memberof'       => $this->getOption('modldap.field_memberof', 'memberof'),
+            'fullname'       => $this->getOption(modLDAP::FIELD_FULLNAME, 'cn'),
+            'email'          => $this->getOption(modLDAP::FIELD_EMAIL, 'mail'),
+            'phone'          => $this->getOption(modLDAP::FIELD_PHONE, ''),
+            'mobilephone'    => $this->getOption(modLDAP::FIELD_MOBILEPHONE, ''),
+            'dob'            => $this->getOption(modLDAP::FIELD_DOB, ''),
+            'gender'         => $this->getOption(modLDAP::FIELD_GENDER, ''),
+            'address'        => $this->getOption(modLDAP::FIELD_ADDRESS, ''),
+            'country'        => $this->getOption(modLDAP::FIELD_COUNTRY, ''),
+            'city'           => $this->getOption(modLDAP::FIELD_CITY, ''),
+            'state'          => $this->getOption(modLDAP::FIELD_STATE, ''),
+            'zip'            => $this->getOption(modLDAP::FIELD_ZIP, ''),
+            'fax'            => $this->getOption(modLDAP::FIELD_FAX, ''),
+            'photo'          => $this->getOption(modLDAP::FIELD_PHOTO, ''),
+            'comment'        => $this->getOption(modLDAP::FIELD_COMMENT, ''),
+            'website'        => $this->getOption(modLDAP::FIELD_WEBSITE, ''),
+            'memberof'       => $this->getOption(modLDAP::FIELD_MEMBEROF, 'memberof')
             );
         
         return array_filter(array_unique($fields));
-    }    
+    }
 }

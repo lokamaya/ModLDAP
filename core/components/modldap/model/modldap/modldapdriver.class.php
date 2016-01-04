@@ -4,8 +4,8 @@
  *
  * Copyright 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates OpenLDAP
- * authentication into MODx Revolution.
+ * This file is part of ModLDAP, which integrates LDAP authentication
+ * into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
@@ -24,63 +24,9 @@
  * @package modldap
 **/
 
-class modLDAPDriver {
-    /* random constants for future dev */
-    const NORMAL_ACCOUNT = 805306368;
-    const WORKSTATION_TRUST = 805306369;
-    const INTERDOMAIN_TRUST = 805306370;
-    const SECURITY_GLOBAL_GROUP = 268435456;
-    const DISTRIBUTION_GROUP = 268435457;
-    const SECURITY_LOCAL_GROUP = 536870912;
-    const DISTRIBUTION_LOCAL_GROUP = 536870913;
-    const FOLDER = 'OU';
-    const CONTAINER = 'CN';
-    //const OPT_ACCOUNT_SUFFIX = 'modldap.account_suffix';
-    //const OPT_BASE_DN = 'modldap.base_dn';
-    //const OPT_FULL_NAME_FIELD = 'modldap.full_name_field';
-    //const OPT_REAL_PRIMARYGROUP = 'modldap.real_primarygroup';
-    //const OPT_RECURSIVE_GROUPS = 'modldap.recursive_groups';
-    //const OPT_USE_SSL = 'modldap.use_ssl';
-    //const OPT_USE_TLS = 'modldap.use_tls';
-    
-    const OPT_DEBUG_LEVEL = 'modldap.ldap_opt_debug'; // 0=disable, 7=debug
-    
-    const OPT_CONNECTION_TYPE = 'modldap.ldap_opt_connection_type';  // SSL, TLS, or empty (normal)
-    const OPT_LDAP_SSL_PORT = 'modldap.ldap_opt_ssl_port'; //default: 636
-    
-    const OPT_LDAP_PROTOCOL_VERSION = 'modldap.ldap_opt_protocol_version';  //default: 3
-    const OPT_NETWORK_TIMEOUT = 'modldap.ldap_opt_network_timeout';   //default: 10
-    const OPT_LDAP_TIMELIMIT = 'modldap.ldap_opt_timelimit';   //default: 10
-    const OPT_LDAP_REFERRALS = 'modldap.ldap_opt_referrals';   //default: 0 (disable)
-
-    const FORMAT_LDAP_BIND = 'modldap.format_ldap_bind';
-    const FORMAT_LDAP_SEARCH_BASEDN = 'modldap.format_ldap_search_basedn';
-    const FORMAT_LDAP_SEARCH_FILTER = 'modldap.format_ldap_search_filter';
-    const FORMAT_LDAP_GROUPS = 'modldap.format_ldap_groups';
-    
-    const LDAP_GROUP_ADD = 'modldap.ldap_group_add';
-    const LDAP_GROUP_FIELD = 'modldap.ldap_group_field';
-    const LDAP_GROUP_ROLE = 'modldap.ldap_group_role';
-    
-    const AUTOADD_USERGROUPS = 'modldap.autoadd_usergroups';
-    const AUTOADD_USERGROUPS_NAME = 'modldap.autoadd_usergroups_name';
-    const AUTOADD_USERGROUPS_ROLE = 'modldap.autoadd_usergroups_role';
-
-    /**
-     * @var string Comma-separated list of domain controllers. Specifiy multiple
-     * controllers if you would like the class to balance the LDAP queries
-     * amongst multiple servers
-     */
-    const OPT_DOMAIN_CONTROLLERS = 'modldap.domain_controllers';
-    
-    /**
-     * @var string Optional account with higher privileges for searching.
-     * This should be set to a domain admin account.
-     * :: not used
-     */
-    const OPT_ADMIN_USERNAME = 'modldap.admin_username';
-    const OPT_ADMIN_PASSWORD = 'modldap.admin_password';
-
+class modLDAPDriver {    
+    const MODLDAPDRIVER = 'modLDAPDriver';                                      // modLDAPDriver
+    const MODLDAP_ENABLED = 'modldap.enabled';                                  // LDAP Enabled
 
     public $config = array();
     public $modx = null;
@@ -93,11 +39,13 @@ class modLDAPDriver {
     */
     protected $_conn;
     protected $_bind;
-    protected $_search;
-    protected $_basedn;
-    protected $_filter;
-    protected $_entries;
-    protected $_remotekey;
+    
+    protected $_search_attributes;
+    
+    protected $_ldapDebugLevel;
+    protected $_modxDebugLevel;
+    
+    protected $ldap_entries;
 
     /**
     * Default Constructor
@@ -109,16 +57,22 @@ class modLDAPDriver {
     */
     function __construct(modX $modx, array $config = array()) {   
         $this->modx =& $modx;
-        $this->modx->log(modX::LOG_LEVEL_DEBUG, '[ModLDAP:Driver] Initialize modLDAPDriver');
+        
+        if ($this->checkLdapSupport() === false) {
+            $this->modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP:Driver] No LDAP support for PHP. See: http://www.php.net/ldap');
+        }
         
         $this->config = array_merge(array(
         ), $config);
-
-        if ($this->checkLdapSupport() === false) {
-            $this->modx->log(modX::LOG_LEVEL_ERROR,'[ModLDAP:Driver] No LDAP support for PHP. See: http://www.php.net/ldap');
-        }
-
-        $this->connect();
+        
+        $this->_ldapDebugLevel = (int)$this->getOption(modLDAP::LDAP_OPT_DEBUG, 0);
+        $this->_modxDebugLevel = (int)$this->modx->getLogLevel();
+        $this->_search_attributes = $this->getAttributsFromFields();
+        
+        $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] modLDAPDriver initialized...');
+        
+        // DO NOT AUTO CONNECT: Only connect when needed
+        // $this->connect();
     }
 
     /**
@@ -132,16 +86,16 @@ class modLDAPDriver {
         $this->close();
     }
 
+    public function is_connected() {
+        return $this->_conn;
+    }
+
     public function setOption($k, $v) {
         $this->config[$k] = $v;
     }
 
     public function getOption($k, $return = '') {
         return $this->modx->getOption($k, $this->config, $return);
-    }
-
-    public function is_connected() {
-        return $this->_conn;
     }
     
     /**
@@ -150,41 +104,38 @@ class modLDAPDriver {
     * @return bool
     */
     public function connect() {
-        $debug_level = $this->getOption(modLDAPDriver::OPT_DEBUG_LEVEL, 0);
-        $connection_type = $this->getOption(modLDAPDriver::OPT_CONNECTION_TYPE, 'NORMAL');
-        $connection_port = (int)$this->getOption(modLDAPDriver::OPT_LDAP_SSL_PORT, 636);
+        if ($this->is_connected()) return;
         
-        if ($debug_level > 0) {
-            ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, $debug_level);
-        }
+        $connection_type = $this->getOption(modLDAP::CONNECTION_TYPE, 'NORMAL');
+        $connection_port = (int)$this->getOption(modLDAP::SSL_PORT, 636);
         
-        // Connect to the AD/LDAP server as the username/password
+        //Output LDAP Debuging: 7
+        @ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, $this->_ldapDebugLevel);
+        
         $dc = $this->getRandomController();
-        $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connecting to ' . $dc . ' using ' . $connection_type . ' connection...');
-        
         if ($connection_type = 'SSL') {
-            $this->_conn = ldap_connect("ldaps://".$dc, $connection_port);
+            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connecting to ldaps://' . $dc . ' using ' . $connection_type . ' connection!');
+            $this->_conn = @ldap_connect("ldaps://".$dc, $connection_port);
         } else {
-            $this->_conn = ldap_connect($dc);
+            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connecting to ' . $dc . ' using NORMAL connection!');
+            $this->_conn = @ldap_connect($dc);
         }
         
         if (!$this->_conn) {
-            $this->modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP:Driver] Can not connect to ' . $dc . ' using ' . $connection_type . ' connection!');
-            $this->modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP:Driver][Connect Error] ' . $this->getLastError() . '');
+            $this->getLastError('Can not connect to ' . $dc . ' using ' . $connection_type . ' connection!');
             return false;
         }
 
         // Set some ldap options for talking to AD
-        ldap_set_option($this->_conn, LDAP_OPT_PROTOCOL_VERSION, (int)$this->getOption(modLDAPDriver::OPT_LDAP_PROTOCOL_VERSION, 3));
-        ldap_set_option($this->_conn, LDAP_OPT_REFERRALS, (int)$this->getOption(modLDAPDriver::OPT_LDAP_REFERRALS, 0));
-        ldap_set_option($this->_conn, LDAP_OPT_TIMELIMIT, (int)$this->getOption(modLDAPDriver::OPT_NETWORK_TIMEOUT, 10));
-        ldap_set_option($this->_conn, LDAP_OPT_TIMELIMIT, (int)$this->getOption(modLDAPDriver::OPT_LDAP_TIMELIMIT, 10));
+        @ldap_set_option($this->_conn, LDAP_OPT_PROTOCOL_VERSION, (int)$this->getOption(modLDAP::LDAP_OPT_PROTOCOL_VERSION, 3));
+        @ldap_set_option($this->_conn, LDAP_OPT_REFERRALS, (int)$this->getOption(modLDAP::LDAP_OPT_REFERRALS, 0));
+        @ldap_set_option($this->_conn, LDAP_OPT_TIMELIMIT, (int)$this->getOption(modLDAP::LDAP_OPT_NETWORK_TIMEOUT, 10));
+        @ldap_set_option($this->_conn, LDAP_OPT_TIMELIMIT, (int)$this->getOption(modLDAP::LDAP_OPT_TIMELIMIT, 10));
 
         if ($connection_type == 'TLS') {
             $tls = @ldap_start_tls($this->_conn);
             if (!$tls) {
-                $this->modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP:Driver] Connect LDAP via TLS error: ' . $dc . '!');
-                $this->modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP:Driver][Connect Error] ' . $this->getLastError() . '');
+                $this->getLastError('TLS error:');
                 return false;
             }
         }
@@ -198,7 +149,10 @@ class modLDAPDriver {
     * @return void
     */
     public function close() {
-        @ldap_close($this->_conn);
+        if ($this->is_connected()) {
+            @ldap_close($this->_conn);
+        }
+        $this->_conn=null;
     }
 
     /**
@@ -211,58 +165,86 @@ class modLDAPDriver {
     * @internal param \optional $bool $prevent_rebind
     * @return bool
     **/
-    public function authenticate($username, $password, $preventRebind = false){
+    public function authenticate($username, $password){
         if (!($this->is_connected())) {
-            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connection not available. Authentication fail!');
+            if (!$this->connect()) return false;
+        }
+        
+        if (empty($username) || empty($password)) {
+            $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Username or Password is empty!');
             return false;
         }
         
-        $found = false;
-        if (empty($username) || empty($password)) {
-            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Username or Password is empty!' . "$username - $password");
-            return $found;
-        }
-
-        // Bind as the user
+        $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Authenticating username: ' . $username);
+        
+        // Bind username using desired format
         $remote_key    = $this->parseBindUsername($username, $password);
-        $remote_basedn = array_unique($this->parseSearchBaseDN($username));
-        $remote_filter = array_unique($this->parseSearchFilter($username));
         
-        //print_r($remote_basedn);
-        //die();
+        // Data
+        $_username = $this->parseBindUsername($username, $password);
+        $this->ldap_entries = array(
+            'username'      => $username, 
+            'password'      => $password, 
+            'remote_key'    => $_username, 
+            'result'        => array(),
+        );
         
-        $this->_bind = @ldap_bind($this->_conn, $remote_key, $password);
-
-        if (!$this->_bind) {
-            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Username or Password not match!' . "$remote_key - $username");
-            return $found;
-        }
-        
-        //$this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] ' . serialize($remote_basedn));
-        //$this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] ' . serialize($remote_filter));
-        
-        foreach ($remote_basedn as $basedn) {
-            foreach ($remote_filter as $filter) {
-                $basedn = trim($basedn);
-                $filter = trim($filter);
-                $this->_search = @ldap_search($this->_conn, $basedn, $filter);
-                
-                if (($this->_search) && ldap_count_entries($this->_conn, $this->_search) > 0) {
-                    $found = true;
+        if ($this->_bind = $this->modldap_bind($_username, $password)) {
+            $remote_basedn = $this->parseSearchBaseDN($username); //array
+            $remote_filter = $this->parseSearchFilter($username); //array
+            
+            if (empty($remote_basedn)) {
+                $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Can not find valid BaseDN, modldap.format_ldap_search_basedn is empty!');
+                return false;
+            }
+            
+            $_result = array();
+            foreach ($remote_basedn as $basedn) {
+                foreach ($remote_filter as $filter) {
+                    $basedn = trim($basedn);
+                    $filter = trim($filter);
                     
-                    $this->_remotekey = $remote_key;
-                    $this->_basedn = $basedn;
-                    $this->_filter = $filter;
-                    
-                    break;
-                } else {
-                    $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] ' . $this->getLastError() . " for ''ldap_search($basedn, $filter)'' ");
+                    if ($_entries = $this->modldap_search_entries($basedn, $filter, $this->_search_attributes)) {
+                        $_result = array_merge($_result, $_entries);
+                    }
                 }
             }
-            if ($found) break;
+            
+            if (empty($_result)) {
+                return false;
+            }
+            
+            $this->ldap_entries['result'] = $_result;
+            unset($_result);
+            return true;
+        }
+    }
+    
+    public function modldap_bind($username, $password) {
+        $_bind = @ldap_bind($this->_conn, $username, $password);
+
+        if (!$_bind) {
+            $this->getLastError('ldap_bind: can not authenticate ' . $username . ':');
+            return false;
         }
         
-        return $found;
+        return $_bind;
+    }
+    
+    public function modldap_search_entries($basedn, $filter, $attributes) {
+        $src = @ldap_search($this->_conn, $basedn, $filter, $attributes);
+        
+        if ($src) {
+            if (ldap_count_entries($this->_conn, $src) > 0) {
+                return ldap_get_entries($this->_conn, $src);
+            } else {
+                $this->getLastError('ldap_count_entries 0 or null:');
+            }
+        } else {
+            $this->getLastError('ldap_search error: ' . " 'ldap_search($basedn, $filter, " . serialize($this->_search_attributes) . ")'.");
+        }
+        
+        return false;
     }
 
     /**
@@ -270,67 +252,49 @@ class modLDAPDriver {
     * @return array
     */
     public function getLdapEntries(){
-        if (!$this->_search) {
-            $this->modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP:Driver] Trying to get LDAP entries before authenticated!');
-            return null;
-        }
-        
-        $this->_entries = ldap_get_entries($this->_conn, $this->_search);
-        
-        $this->_entries['modldap_remotekey']   = $this->_remotekey;
-        $this->_entries['modldap_remotedata']  = $this->_basedn . '||' . $this->_filter;
-        
-        return $this->_entries;
+        return $this->ldap_entries;
     }
     
     /**
-    * Parse username using modldap.format_ldap_bind
+    * Get last error from LDAP
+    *
+    * This function gets the last message from LDAP
+    * set modldap.ldap_opt_debug=7 to get success/error message (see PHP manual)
     *
     * @return string
     */
-    private function parseBindUsername($username, $password) {
-        $format = $this->getOption(modLDAPDriver::FORMAT_LDAP_BIND, $username);
+    private function getLastError($text='') {
+        if ($this->_ldapDebugLevel<7) return '';
         
-        return str_replace(array('%username%', '%password%'), array($username, $password), $format);
-    }
-
-    /**
-    * Parse ldap_search_filter using modldap.format_ldap_search_basedn
-    *
-    * @return string
-    */
-    private function parseSearchBaseDN($username) {
-        $baseDn = $this->findBaseDn();
-        $format = $this->getOption(modLDAPDriver::FORMAT_LDAP_SEARCH_BASEDN, $baseDn);
-        $format = str_replace('%username%', $username, $format);
-        
-        return preg_split("/[\n\r]+/", $format);
+        $this->logDebug(modX::LOG_LEVEL_DEBUG, '[ModLDAP:Driver] ' . $text . ' ' . @ldap_error($this->_conn));
     }
     
-    /**
-    * Parse ldap_search_filter using modldap.format_ldap_search_filter
-    *
-    * @return string
-    */
-    private function parseSearchFilter($username) {
-        $format = $this->getOption(modLDAPDriver::FORMAT_LDAP_SEARCH_FILTER, $username);
-        $format = str_replace('%username%', $username, $format);
-        return preg_split("/[\n\r]+/", $format);
-    }
-
-
     //************************************************************************************************************
     // SERVER FUNCTIONS
+    /**
+    * Select a random domain controller from your domain controller array
+    *
+    * @return string
+    */
+    protected function getRandomController() {
+        mt_srand(doubleval(microtime()) * 100000000); // For older PHP versions
 
+        $controllers = explode(',', $this->getOption(modLDAP::DOMAIN_CONTROLLERS, '127.0.0.1'));
+
+        return $controllers[array_rand($controllers)];
+    }
+    
     /**
     * Find the Base DN of your domain controller
     *
     * @return string
     */
     private function findBaseDn() {
-        $namingContext = $this->getRootDse(array('defaultnamingcontext'));
-
-        return $namingContext[0]['defaultnamingcontext'][0];
+        if ($namingContext = $this->getRootDse(array('defaultnamingcontext'))) {
+            return array($namingContext[0]['defaultnamingcontext'][0]);
+        }
+        
+        return array();
     }
 
     /**
@@ -352,18 +316,90 @@ class modLDAPDriver {
 
     //************************************************************************************************************
     // UTILITY FUNCTIONS (Many of these functions are protected and can only be called from within the class)
-
     /**
-    * Get last error from Active Directory
-    *
-    * This function gets the last message from Active Directory
-    * This may indeed be a 'Success' message but if you get an unknown error
-    * it might be worth calling this function to see what errors were raised
+    * Parse username using modldap.format_ldap_bind
     *
     * @return string
     */
-    private function getLastError() {
-        return @ldap_error($this->_conn);
+    private function parseBindUsername($username, $password) {
+        $format = $this->getOption(modLDAP::FORMAT_LDAP_BIND, $username);
+        
+        return str_replace(array('%username%', '%password%'), array($username, $password), $format);
+    }
+
+    /**
+    * Get ldap_search BASEDN: modldap.format_ldap_search_basedn
+    *
+    * @return array
+    */
+    private function parseSearchBaseDN($username) {
+        $format = $this->getOption(modLDAP::FORMAT_LDAP_SEARCH_BASEDN, '');
+        
+        if (empty($format)) {
+            $format = str_replace('%username%', $username, $format);
+            $output = preg_split("/[\n\r]+/", $format);
+            
+            return (array_values(array_filter(array_unique($output))));
+        }
+        
+        return $this->findBaseDn();
+    }
+    
+    /**
+    * Parse ldap_search FILTER: modldap.format_ldap_search_filter
+    *
+    * @return array
+    */
+    private function parseSearchFilter($username) {
+        $format = $this->getOption(modLDAP::FORMAT_LDAP_SEARCH_FILTER, $username);
+        $format = str_replace('%username%', $username, $format);
+        
+        $output = preg_split("/[\n\r]+/", $format);
+        return (array_values(array_filter(array_unique($output))));
+    }
+    
+    /**
+    * Get ldap_search ATTRIBUTES
+    * effective search: only get desired fields
+    *
+    * @return array
+    */
+    private function getAttributsFromFields() {
+        $fields = array(
+            $this->getOption(modLDAP::FIELD_FULLNAME, 'cn'),
+            $this->getOption(modLDAP::FIELD_EMAIL, 'mail'),
+            $this->getOption(modLDAP::FIELD_PHONE, ''),
+            $this->getOption(modLDAP::FIELD_MOBILEPHONE, ''),
+            $this->getOption(modLDAP::FIELD_DOB, ''),
+            $this->getOption(modLDAP::FIELD_GENDER, ''),
+            $this->getOption(modLDAP::FIELD_ADDRESS, ''),
+            $this->getOption(modLDAP::FIELD_COUNTRY, ''),
+            $this->getOption(modLDAP::FIELD_CITY, ''),
+            $this->getOption(modLDAP::FIELD_STATE, ''),
+            $this->getOption(modLDAP::FIELD_ZIP, ''),
+            $this->getOption(modLDAP::FIELD_FAX, ''),
+            $this->getOption(modLDAP::FIELD_PHOTO, ''),
+            $this->getOption(modLDAP::FIELD_COMMENT, ''),
+            $this->getOption(modLDAP::FIELD_WEBSITE, ''),
+            $this->getOption(modLDAP::FIELD_MEMBEROF, 'memberof'),
+            );
+        
+        return (array_values(array_filter(array_unique($fields))));
+    }
+
+    /**
+    * LogDebug: output log for debuging purpose
+    *
+    * @param  string $log
+    * @return void
+    */
+    private function logDebug($level, $log) {
+        $debug = ($this->_ldapDebugLevel >= $this->_modxDebugLevel) ? TRUE : FALSE;
+        if ($debug===FALSE) return;
+        
+        $this->modx->setLogLevel(modX::LOG_LEVEL_DEBUG);
+        $this->modx->log($level, $log);
+        $this->modx->setLogLevel($this->_modxDebugLevel);
     }
 
     /**
@@ -373,35 +409,6 @@ class modLDAPDriver {
     */
     protected function checkLdapSupport() {
         return function_exists('ldap_connect');
-    }
-
-    /**
-    * @param string $gid Group ID
-    * @param string $usersid User's Object SID
-    * @return string
-    */
-    protected function getPrimaryGroup($gid, $usersid){
-        //not implemented
-    }
-
-    /**
-    * Convert a binary SID to a text SID
-    *
-    * @param string $binsid A Binary SID
-    * @return string
-    */
-    protected function getTextSID($binsid) {
-        //not implemented
-    }
-
-    /**
-    * Converts a little-endian hex number to one that hexdec() can convert
-    *
-    * @param string $hex A hex code
-    * @return string
-    */
-    protected function littleEndian($hex) {
-        //not implemented
     }
 
     /**
@@ -435,39 +442,7 @@ class modLDAPDriver {
 
         return strtoupper($hex_guid_to_guid_str);
     }
-
-    /**
-    * Converts a binary GUID to a string GUID
-    *
-    * @param string $binaryGuid The binary GUID attribute to convert
-    * @return string
-    */
-    public function decodeGuid($binaryGuid) {
-        //not implemented
-    }
-
-    /**
-    * Converts a string GUID to a hexdecimal value so it can be queried
-    *
-    * @param string $strGUID A string representation of a GUID
-    * @return string
-    */
-    protected function strguid2hex($strGUID) {
-        //not implemented
-    }
-
-    /**
-    * Obtain the user's distinguished name based on their userid
-    *
-    *
-    * @param string $username The username
-    * @param bool $isGUID Is the username passed a GUID or a samAccountName
-    * @return string
-    */
-    protected function userDn($username, $isGUID=false){
-        //not implemented
-    }
-
+    
     /**
     * Encode a password for transmission over LDAP
     *
@@ -497,50 +472,6 @@ class modLDAPDriver {
             '"\\\\\".join("",unpack("H2","$1"))',
             $str
         );
-    }
-
-    /**
-    * Select a random domain controller from your domain controller array
-    *
-    * @return string
-    */
-    protected function getRandomController() {
-        mt_srand(doubleval(microtime()) * 100000000); // For older PHP versions
-
-        $controllers = explode(',', $this->getOption(modLDAPDriver::OPT_DOMAIN_CONTROLLERS, '127.0.0.1'));
-
-        return $controllers[array_rand($controllers)];
-    }
-
-    /**
-    * Account control options
-    *
-    * @param array $options The options to convert to int
-    * @return int
-    */
-    protected function accountControl($options) {
-        //not implemented
-    }
-
-    /**
-    * Take an LDAP query and return the nice names, without all the LDAP prefixes (eg. CN, DN)
-    *
-    * @param array $groups
-    * @return array
-    */
-    protected function niceNames($groups) {
-        //not implemented
-    }
-
-    /**
-    * Convert a boolean value to a string
-    * You should never need to call this yourself
-    *
-    * @param bool $bool Boolean value
-    * @return string
-    */
-    protected function bool2str($bool) {
-        return $bool ? 'TRUE' : 'FALSE';
     }
 
     /**

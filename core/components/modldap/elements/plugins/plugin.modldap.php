@@ -2,11 +2,10 @@
 /**
  * ModLDAP
  *
- * Copyright 2010 by Shaun McCormick <shaun@modx.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates LDAP
- * authentication into MODx Revolution.
+ * This file is part of ModLDAP, which integrates LDAP authentication
+ * into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
@@ -28,58 +27,41 @@
  * Handle plugin events
  * 
  * @package modldap
- */
+**/
 if (!$modx->getOption('modldap.enabled', $scriptProperties, false)) return;
 
-$modldap = $modx->getService('modldap', 'modLDAP', $modx->getOption('modldap.core_path', null, $modx->getOption('core_path') . 'components/modldap/') . 'model/modldap/', $scriptProperties);
-
-if (!($modldap instanceof modLDAP)) {
+//load modLDAP class
+$modLDAP = $modx->getService('modldap', 'modLDAP', $modx->getOption('modldap.core_path', null, $modx->getOption('core_path') . 'components/modldap/') . 'model/modldap/', $scriptProperties);
+if (!($modLDAP instanceof modLDAP)) {
     $modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP] Could not load ModLDAP class.');
     $modx->event->output(false);
     return;
 }
-$modLDAPDriver = $modldap->loadDriver();
-if (!($modLDAPDriver instanceof modLDAPDriver)) {
-    $modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP] Could not load ModLDAPDriver class.');
+
+if ($modx->context->get('key') == 'mgr' && $modx->getOption(modLDAP::LOGIN_MANAGER_DISABLE, $scriptProperties, false)) {
+    $modx->event->output(false);
+    return;
+} else if ($modx->context->get('key') != 'mgr' && $modx->getOption(modLDAP::LOGIN_WEB_DISABLE, $scriptProperties, false)) {
     $modx->event->output(false);
     return;
 }
+    
 
-/* grab correct event processor */
-$eventProcessor = false;
-$continue = true;
 switch ($modx->event->name) {
     /* authentication mgr */
     case 'OnManagerAuthentication':
-        $continue = $modx->getOption('modldap.login_manager_disable', $scriptProperties, false);
-        if (!$continue) {
-            return;
-        }
-        $eventProcessor = 'onauthentication';
+        return $modLDAP->processOnManagerAuthentication();
         break;
         
-    /* authentication context */
+    /* authentication other context */
     case 'OnWebAuthentication':
-        $continue = $modx->getOption('modldap.login_web_disable', $scriptProperties, false);
-        if (!$continue) {
-            return;
-        }
-        $eventProcessor = 'onauthentication';
+        return $modLDAP->processOnWebAuthentication();
         break;
 
     /* onusernotfound */
     case 'OnUserNotFound':
-        $eventProcessor = 'onusernotfound';
+        return $modLDAP->processOnUserNotFound();
         break;
-}
-
-/* if found processor, load it */
-if ($continue && !empty($eventProcessor)) {
-    $eventProcessor = $modldap->config['eventsPath'] . $eventProcessor . '.php';
-
-    if (file_exists($eventProcessor)) {
-        include $eventProcessor;
-    }
 }
 
 return;
