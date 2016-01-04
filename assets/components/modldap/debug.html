@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ModLDAP Debug Sample Result</title>
+  <style>
+    ul, li, p {font-family: "Arial", "Helvetica", sans-serif; font-size:11pt; margin-top:6px; margin-bottom:6px;} 
+    h1, h2, h3, h4, h5, h6, u {font-family: "Times New Roman", "Garamond", Times, serif;}
+    pre {border-left: 10px solid #dddddd; margin-left: 10px; padding-left: 10px;}
+    .success {color:green; font-weight:bold; display:block;}
+    .error {color:red; font-weight:bold; display:block;}
+    .success em, .error em {font-weight: normal; color: #999999;}
+  </style>
+</head>
+
+<body>
+  <h1>ModLDAP Debug Sample Result</h1>
+  
+  <h2><u>Process:</u></h2>
+  <ul>
+    <li>Connecting to <strong>ldaps://localhost</strong> using SSL: <span class="success">Success <em> processed in 0.0001 s</em></span></li>
+    <li>Binding to localhost using <strong>uid=MyUsername,dc=domain,dc=com</strong>: <span class="success">Success <em> processed in 3.3802 s</em></span></li>
+    <li>Searching entries using basedn <strong>dc=domain,dc=com</strong>: <span class="success">Success <em> processed in 0.7210 s</em></span></li>
+    <li>Get LDAP entries: <span class="success">Success <em> processed in 0.0010 s</em></span></li>  
+  </ul>
+  
+  <h2><u>Results:</u></h2>
+  <p>Below are the entries from LDAP</p>
+  <pre>
+Array (
+    [count] => 1
+    [0] => Array (
+            [displayname] => Array (
+                    [count] => 1
+                    [0] => <b>Firstname Lastname</b>
+                )
+            [0] => cn
+            
+            [email] => Array (
+                    [count] => 1
+                    [0] => <b>myemail@domain.com</b>
+                )
+            [1] => mail
+            
+            [memberof] => Array (
+                    [count] => 2
+                    [0] => <b>cn=GroupName1,ou=groups</b>
+                    [1] => <b>cn=GroupName2,ou=groups</b>
+                )
+            [2] => memberof
+            
+            [count] => 3
+            [dn] => <b>uid=MyUsername,dc=domain,dc=com</b>
+        )
+)
+  </pre>
+  
+</body>
+</html>
