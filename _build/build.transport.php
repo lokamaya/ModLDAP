@@ -2,7 +2,7 @@
 /**
  * ModLDAP
  *
- * Copyright 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2016 by Zaenal Muttaqin <zaenal@lokamaya.com>
  *
  * This file is part of ModLDAP, which integrates LDAP authentication
  * into MODx Revolution.
@@ -54,7 +54,7 @@ $sources = array(
     'lexicon' => $root . 'core/components/'.PKG_NAME_LOWER.'/lexicon/',
     'docs' => $root.'core/components/'.PKG_NAME_LOWER.'/docs/',
     //'pages' => $root.'core/components/'.PKG_NAME_LOWER.'/elements/pages/',
-    //'source_assets' => $root.'assets/components/'.PKG_NAME_LOWER,
+    'source_assets' => $root.'assets/components/'.PKG_NAME_LOWER,
     'source_core' => $root.'core/components/'.PKG_NAME_LOWER,
 );
 unset($root);
@@ -105,12 +105,10 @@ $attributes = array (
 );
 $vehicle = $builder->createVehicle($plugin, $attributes);
 $modx->log(modX::LOG_LEVEL_INFO,'Adding file resolvers to plugin...');
-/*
 $vehicle->resolve('file',array(
     'source' => $sources['source_assets'],
     'target' => "return MODX_ASSETS_PATH . 'components/';",
 ));
-*/
 $vehicle->resolve('file',array(
     'source' => $sources['source_core'],
     'target' => "return MODX_CORE_PATH . 'components/';",
