@@ -2,7 +2,7 @@
 /**
  * ModLDAP
  *
- * Copyright 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2015 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
  * This file is part of ModLDAP, which integrates LDAP authentication
  * into MODx Revolution.
@@ -46,11 +46,12 @@ class modLDAPDriver {
     protected $_modxDebugLevel;
     
     protected $ldap_entries;
-
+    
+    protected $_check;
     /**
     * Default Constructor
     *
-    * Tries to bind to the AD domain over LDAP or LDAPS
+    * Tries to bind to the LDAP host over ldap:// or ldaps:// or TLS over ldap://
     *
     * @param modX $modx A reference to the modX object
     * @param array $config Array of options to pass to the constructor
@@ -73,6 +74,7 @@ class modLDAPDriver {
         
         // DO NOT AUTO CONNECT: Only connect when needed
         // $this->connect();
+        
     }
 
     /**
@@ -126,11 +128,13 @@ class modLDAPDriver {
             return false;
         }
 
-        // Set some ldap options for talking to AD
+        // Set some ldap options for talking to LDAP
         @ldap_set_option($this->_conn, LDAP_OPT_PROTOCOL_VERSION, (int)$this->getOption(modLDAP::LDAP_OPT_PROTOCOL_VERSION, 3));
         @ldap_set_option($this->_conn, LDAP_OPT_REFERRALS, (int)$this->getOption(modLDAP::LDAP_OPT_REFERRALS, 0));
         @ldap_set_option($this->_conn, LDAP_OPT_TIMELIMIT, (int)$this->getOption(modLDAP::LDAP_OPT_NETWORK_TIMEOUT, 10));
         @ldap_set_option($this->_conn, LDAP_OPT_TIMELIMIT, (int)$this->getOption(modLDAP::LDAP_OPT_TIMELIMIT, 10));
+        
+        $this->_check = set_time_limit(((int)$this->getOption(modLDAP::LDAP_OPT_NETWORK_TIMEOUT, 10) + (int)$this->getOption(modLDAP::LDAP_OPT_TIMELIMIT, 10)) * 2);
 
         if ($connection_type == 'TLS') {
             $tls = @ldap_start_tls($this->_conn);

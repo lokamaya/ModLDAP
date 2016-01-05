@@ -3,7 +3,7 @@
  * ModLDAP
  *
  * Copyright 2010 by Shaun McCormick <shaun@modx.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
  * This file is part of ModLDAP, which integrates LDAP authentication
  * into MODx Revolution.
@@ -82,7 +82,7 @@ $generator->classTemplate= <<<EOD
  * ModLDAP
  *
  * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
  * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
@@ -115,7 +115,7 @@ $generator->platformTemplate= <<<EOD
  * ModLDAP
  *
  * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
  * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.
@@ -149,7 +149,7 @@ $generator->mapHeader= <<<EOD
  * ModLDAP
  *
  * Copyright 2010 by Shaun McCormick <shaun@modxcms.com>
- * Modified in 2015 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Modified in 2015 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
  * This file is part of ModLDAP, which integrates LDAP
  * authentication into MODx Revolution.

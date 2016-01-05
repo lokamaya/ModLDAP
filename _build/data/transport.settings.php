@@ -2,7 +2,7 @@
 /**
  * ModLDAP
  *
- * Copyright 2010 by Zaenal Muttaqin <zaenal@lokamaya.com>
+ * Copyright 2010 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
  * This file is part of ModLDAP, which integrates LDAP authentication
  * into MODx Revolution.
