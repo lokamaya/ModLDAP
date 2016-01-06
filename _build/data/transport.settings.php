@@ -44,7 +44,7 @@ $settings['modldap.enabled']->fromArray(array(
 $settings['modldap.login_manager_disable']= $modx->newObject('modSystemSetting');
 $settings['modldap.login_manager_disable']->fromArray(array(
     'key' => 'modldap.login_manager_disable',
-    'value' => false,
+    'value' => true,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
     'area' => 'LDAP-Administration',
@@ -53,15 +53,6 @@ $settings['modldap.login_manager_disable']->fromArray(array(
 $settings['modldap.login_web_disable']= $modx->newObject('modSystemSetting');
 $settings['modldap.login_web_disable']->fromArray(array(
     'key' => 'modldap.login_web_disable',
-    'value' => true,
-    'xtype' => 'combo-boolean',
-    'namespace' => 'modldap',
-    'area' => 'LDAP-Administration',
-),'',true,true);
-
-$settings['modldap.update_enabled']= $modx->newObject('modSystemSetting');
-$settings['modldap.update_enabled']->fromArray(array(
-    'key' => 'modldap.update_enabled',
     'value' => false,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
@@ -148,7 +139,7 @@ $settings['modldap.format_ldap_bind']->fromArray(array(
     'value' => 'uid=%username%,ou=member,dc=domain,dc=tld',
     'xtype' => 'textfield',
     'namespace' => 'modldap',
-    'area' => 'LDAP-Query',
+    'area' => 'LDAP-Parsing',
 ),'',true,true);
 
 $settings['modldap.format_ldap_search_basedn']= $modx->newObject('modSystemSetting');
@@ -157,7 +148,7 @@ $settings['modldap.format_ldap_search_basedn']->fromArray(array(
     'value' => 'dc=domain,dc=tld',
     'xtype' => 'textfield',
     'namespace' => 'modldap',
-    'area' => 'LDAP-Query',
+    'area' => 'LDAP-Parsing',
 ),'',true,true);
 
 $settings['modldap.format_ldap_search_filter']= $modx->newObject('modSystemSetting');
@@ -166,7 +157,15 @@ $settings['modldap.format_ldap_search_filter']->fromArray(array(
     'value' => '(&(objectClass=person)(uid=%username%))',
     'xtype' => 'textfield',
     'namespace' => 'modldap',
-    'area' => 'LDAP-Query',
+    'area' => 'LDAP-Parsing',
+),'',true,true);
+$settings['modldap.format_ldap_groups']= $modx->newObject('modSystemSetting');
+$settings['modldap.format_ldap_groups']->fromArray(array(
+    'key' => 'modldap.format_ldap_groups',
+    'value' => '@cn\=([^,\=]+).*@i',
+    'xtype' => 'textfield',
+    'namespace' => 'modldap',
+    'area' => 'LDAP-Parsing',
 ),'',true,true);
 
 /* User */
@@ -176,7 +175,7 @@ $settings['modldap.autoadd_usergroups']->fromArray(array(
     'value' => true,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
-    'area' => 'LDAP-User',
+    'area' => 'UserGroup',
 ),'',true,true);
 
 $settings['modldap.autoadd_usergroups_name']= $modx->newObject('modSystemSetting');
@@ -185,44 +184,39 @@ $settings['modldap.autoadd_usergroups_name']->fromArray(array(
     'value' => 'LDAP',
     'xtype' => 'textfield',
     'namespace' => 'modldap',
-    'area' => 'LDAP-User',
+    'area' => 'UserGroup',
 ),'',true,true);
 
 $settings['modldap.autoadd_usergroups_role']= $modx->newObject('modSystemSetting');
 $settings['modldap.autoadd_usergroups_role']->fromArray(array(
-        'key' => 'modldap.autoadd_usergroups_role',
-        'value' => 'Member',
-        'xtype' => 'textfield',
-        'namespace' => 'modldap',
-        'area' => 'LDAP-User',
+    'key' => 'modldap.autoadd_usergroups_role',
+    'value' => 'Member',
+    'xtype' => 'textfield',
+    'namespace' => 'modldap',
+    'area' => 'UserGroup',
 ),'',true,true);
 
 $settings['modldap.ldap_group_add']= $modx->newObject('modSystemSetting');
 $settings['modldap.ldap_group_add']->fromArray(array(
     'key' => 'modldap.ldap_group_add',
-    'value' => true,
+    'value' => false,
     'xtype' => 'combo-boolean',
     'namespace' => 'modldap',
-    'area' => 'LDAP-User',
+    'area' => 'UserGroup',
 ),'',true,true);
 
+/*
 $settings['modldap.ldap_group_role']= $modx->newObject('modSystemSetting');
 $settings['modldap.ldap_group_role']->fromArray(array(
        'key' => 'modldap.ldap_group_role',
        'value' => 'Member',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-User',
+       'area' => 'UserGroup',
 ),'',true,true);
+*/
 
-$settings['modldap.format_ldap_groups']= $modx->newObject('modSystemSetting');
-$settings['modldap.format_ldap_groups']->fromArray(array(
-       'key' => 'modldap.format_ldap_groups',
-       'value' => '@cn\=([^,\=]+).*@i',
-       'xtype' => 'textfield',
-       'namespace' => 'modldap',
-       'area' => 'LDAP-User',
-),'',true,true);
+
 
 
 /* User Fields */
@@ -232,7 +226,7 @@ $settings['modldap.field_fullname']->fromArray(array(
        'value' => 'cn',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_email']= $modx->newObject('modSystemSetting');
@@ -241,7 +235,7 @@ $settings['modldap.field_email']->fromArray(array(
        'value' => 'mail',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_phone']= $modx->newObject('modSystemSetting');
@@ -250,7 +244,7 @@ $settings['modldap.field_phone']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_mobilephone']= $modx->newObject('modSystemSetting');
@@ -259,7 +253,7 @@ $settings['modldap.field_mobilephone']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_dob']= $modx->newObject('modSystemSetting');
@@ -268,7 +262,7 @@ $settings['modldap.field_dob']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_gender']= $modx->newObject('modSystemSetting');
@@ -277,7 +271,7 @@ $settings['modldap.field_gender']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_address']= $modx->newObject('modSystemSetting');
@@ -286,7 +280,7 @@ $settings['modldap.field_address']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_country']= $modx->newObject('modSystemSetting');
@@ -295,7 +289,7 @@ $settings['modldap.field_country']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_city']= $modx->newObject('modSystemSetting');
@@ -304,7 +298,7 @@ $settings['modldap.field_city']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_state']= $modx->newObject('modSystemSetting');
@@ -313,7 +307,7 @@ $settings['modldap.field_state']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_zip']= $modx->newObject('modSystemSetting');
@@ -322,7 +316,7 @@ $settings['modldap.field_zip']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_fax']= $modx->newObject('modSystemSetting');
@@ -331,7 +325,7 @@ $settings['modldap.field_fax']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_photo']= $modx->newObject('modSystemSetting');
@@ -340,7 +334,7 @@ $settings['modldap.field_photo']->fromArray(array(
        'value' => 'jpegphoto',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_comment']= $modx->newObject('modSystemSetting');
@@ -349,7 +343,7 @@ $settings['modldap.field_comment']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_website']= $modx->newObject('modSystemSetting');
@@ -358,7 +352,7 @@ $settings['modldap.field_website']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 $settings['modldap.field_memberof']= $modx->newObject('modSystemSetting');
@@ -367,7 +361,7 @@ $settings['modldap.field_memberof']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserField',
+       'area' => 'UserField',
 ),'',true,true);
 
 
@@ -378,7 +372,7 @@ $settings['modldap.photo_path']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserPhoto',
+       'area' => 'UserPhoto',
 ),'',true,true);
 
 $settings['modldap.photo_url']= $modx->newObject('modSystemSetting');
@@ -387,7 +381,25 @@ $settings['modldap.photo_url']->fromArray(array(
        'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
-       'area' => 'LDAP-UserPhoto',
+       'area' => 'UserPhoto',
+),'',true,true);
+
+$settings['modldap.photo_import_size']= $modx->newObject('modSystemSetting');
+$settings['modldap.photo_import_size']->fromArray(array(
+       'key' => 'modldap.photo_import_size',
+       'value' => '300',
+       'xtype' => 'numberfield',
+       'namespace' => 'modldap',
+       'area' => 'UserPhoto',
+),'',true,true);
+
+$settings['modldap.photo_import_quality']= $modx->newObject('modSystemSetting');
+$settings['modldap.photo_import_quality']->fromArray(array(
+       'key' => 'modldap.photo_import_quality',
+       'value' => '75',
+       'xtype' => 'numberfield',
+       'namespace' => 'modldap',
+       'area' => 'UserPhoto',
 ),'',true,true);
 
 return $settings;
