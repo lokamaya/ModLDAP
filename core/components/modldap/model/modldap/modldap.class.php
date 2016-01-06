@@ -2,10 +2,10 @@
 /**
  * ModLDAP
  *
- * Copyright 2015 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
+ * Copyright 2016 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates LDAP authentication
- * into MODx Revolution.
+ * This file is part of ModLDAP, which integrates LDAP
+ * authentication into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
@@ -86,6 +86,8 @@ class modLDAP {
     // Photo path and url
     const PHOTO_PATH = 'modldap.photo_path';                                    // Base Photo Path
     const PHOTO_URL = 'modldap.photo_url';                                      // Base Photo URL
+    const PHOTO_IMPORT_SIZE = 'modldap.photo_import_size';                      // Base Photo URL
+    const PHOTO_IMPORT_QUALITY = 'modldap.photo_import_quality';                // Base Photo URL
 
     function __construct(modX &$modx, array $config = array()) {
         $this->modx =& $modx;
@@ -130,8 +132,6 @@ class modLDAP {
      * @return vary
     **/
     public function processOnUserNotFound() {
-        $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:processOnUserNotFound] Processing...');
-        
         $scriptProperties = $this->modx->event->params;
         $this->modx->event->_output = false;
         
@@ -158,8 +158,6 @@ class modLDAP {
      * @return vary
     **/
     public function processOnManagerAuthentication() {
-        $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:processOnAuthentication] Processing...');
-        
         $scriptProperties = $this->modx->event->params;
         $this->modx->event->_output = false;
 
@@ -219,7 +217,6 @@ class modLDAP {
      * @return vary
     **/
     public function processOnWebAuthentication() {
-        //$this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:processOnManagerAuthentication] Processing...');
         return $this->processOnManagerAuthentication();
     }
     
@@ -227,6 +224,70 @@ class modLDAP {
     /********************************
      * Utility                     *
     ********************************/
+    /**
+     * Output debug to Manager Log
+     *
+     * @access public
+     * @param string $username: valid LDAP username
+     * @param string $password: valid LDAP password
+     * @return void
+    **/
+    public function testModLDAP($username, $password, $clearLog=false) {
+        if ($clearLog) {
+            $log = $this->modx->getOption('modldap.core_path', null, $this->modx->getOption('core_path') . 'cache/logs/error.log');
+            if (is_file($log)) unlink($log);
+        }
+        
+        //$this->modx->log(modX::LOG_LEVEL_INFO, "[Test:ModLDAP] Start\n-------------------------------------");
+        $user = $this->modx->newObject('modLDAPUser');
+        
+        /*
+        if (!isset($_SESSION['ldap_entries'])) {
+            if ( !($user->Driver->authenticate($username, $password)) ) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR, 'Can not authenticate username: ' . $username);
+                return;
+            }
+            $ldap_entries = $user->Driver->getLdapEntries();
+            $_SESSION['ldap_entries'] = $ldap_entries;
+        } else {
+            $ldap_entries = $_SESSION['ldap_entries'];
+        }
+        */
+        
+        $ldap_entries = $user->Driver->getLdapEntries();
+        $user->set_ldap_entries($ldap_entries);
+        
+        $field_mapping = $user->ldap_field_mapping();
+        $field_mapping['dn'] = 'dn';
+        
+        $text = "  <h3>Results</h3>\n";
+        $text .= "  <span>Result from LDAP entries:</span>\n";
+        $text .= "  <dl>\n";
+        foreach($field_mapping as $field=>$map) {
+            $value = '';
+            if (empty($map)) {
+                $map = "<em>empty</em>";
+            } else {
+                if ($field=='photo') {
+                    $value = "[photo]";
+                } else if ($field=='memberof') {
+                    $groups = $user->getManyLdapEntryGroup($field, false);
+                    $value = implode("<br/>- ", $groups);
+                } else {
+                    $value = $user->getOneLdapEntry($field);
+                }
+                $map = "<strong>$map</strong>";
+            }
+            
+            $text .= "    <dt>" . strtoupper($field) . " ($map):</dt>\n";
+            $text .= "    <dd>- $value &nbsp;</dd>\n";
+        }
+        $text .= "  </dl>\n";
+        
+        //$this->modx->log(modX::LOG_LEVEL_INFO, "END\n-------------------------------------\n\n");
+        return $text;
+    }
+    
     /**
      * Initializes ModLDAP into different contexts.
      *
@@ -244,7 +305,6 @@ class modLDAP {
      * @return object modLDAPDriver
     **/
     public function loadDriver() {
-        $this->modx->log(modX::LOG_LEVEL_INFO, '[modLDAP] Loading modLDAPDriver...');
         $modldapdriver = $this->modx->getService('modldapdriver', 'modLDAPDriver', $this->config['modelPath'] . 'modldap/');
 
         if (!($modldapdriver instanceof modLDAPDriver)) {

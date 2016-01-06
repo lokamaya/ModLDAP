@@ -1,7 +1,19 @@
 Changelog for ModLDAP.
 
-ModLDAP 2.4.1 alpha
+ModLDAP 2.4.1-alpha
 ======================
-- Branched from ActiveDirectoryRedux 2.4.0 beta1
-- Remove unnecessary files/folder
-- Modify some configuration for OpenLDAP
+- Developed and tested on MODX Revo 2.4.2
+- Refactoring modLDAP base class
+- Refactoring LDAP Driver for connection and authentication
+- Refactoring modLDAPUser (extends modUSER)
+- Plugin has been modified
+- A lot of modification to ModLDAP System Setting
+- [NEW] Snippet for debuging: ModLDAPDebug
+- [NEW] Import user photo from LDAP 
+- [NEW] Add LDAP User to certain group and role
+- [NOT IMPLEMENTED] Add LDAP Group to MODX
+
+
+ModLDAP 2.4.0-beta1
+======================
+- Branched from ActiveDirectoryRedux 2.4.0-beta1

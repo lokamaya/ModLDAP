@@ -125,3 +125,7 @@ $_lang['setting_modldap.photo_path']        = 'Base Photo Path';
 $_lang['setting_modldap.photo_path_desc']   = 'Path to save Photo Profile. If empty, will use default MODx /assets/components/modldap/';
 $_lang['setting_modldap.photo_url']         = 'Base Photo URL';
 $_lang['setting_modldap.photo_url_desc']    = 'URL to get Photo Profile. If empty, will use <em>yourdomain.com</em>/assets/components/modldap/';
+$_lang['setting_modldap.photo_import_size']         = 'Max Photo Size';
+$_lang['setting_modldap.photo_import_size_desc']    = 'Maximum size for photo. Default 300 pixel.';
+$_lang['setting_modldap.photo_import_quality']      = 'Max Photo Size';
+$_lang['setting_modldap.photo_import_quality_desc'] = 'JPEG image quality between 0-100. Default 75.';

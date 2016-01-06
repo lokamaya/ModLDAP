@@ -2,10 +2,10 @@
 /**
  * ModLDAP
  *
- * Copyright 2015 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
+ * Copyright 2016 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates LDAP authentication
- * into MODx Revolution.
+ * This file is part of ModLDAP, which integrates OpenLDAP
+ * authentication into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
@@ -46,12 +46,11 @@ class modLDAPDriver {
     protected $_modxDebugLevel;
     
     protected $ldap_entries;
-    
-    protected $_check;
+
     /**
     * Default Constructor
     *
-    * Tries to bind to the LDAP host over ldap:// or ldaps:// or TLS over ldap://
+    * Tries to bind to the AD domain over LDAP or LDAPS
     *
     * @param modX $modx A reference to the modX object
     * @param array $config Array of options to pass to the constructor
@@ -71,10 +70,8 @@ class modLDAPDriver {
         $this->_search_attributes = $this->getAttributsFromFields();
         
         $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] modLDAPDriver initialized...');
-        
         // DO NOT AUTO CONNECT: Only connect when needed
         // $this->connect();
-        
     }
 
     /**
@@ -116,10 +113,10 @@ class modLDAPDriver {
         
         $dc = $this->getRandomController();
         if ($connection_type = 'SSL') {
-            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connecting to ldaps://' . $dc . ' using ' . $connection_type . ' connection!');
+            $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connecting to ldaps://' . $dc . ' using ' . $connection_type . ' connection!');
             $this->_conn = @ldap_connect("ldaps://".$dc, $connection_port);
         } else {
-            $this->modx->log(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connecting to ' . $dc . ' using NORMAL connection!');
+            $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connecting to ' . $dc . ' using NORMAL connection!');
             $this->_conn = @ldap_connect($dc);
         }
         
@@ -128,13 +125,11 @@ class modLDAPDriver {
             return false;
         }
 
-        // Set some ldap options for talking to LDAP
+        // Set some ldap options for talking to AD
         @ldap_set_option($this->_conn, LDAP_OPT_PROTOCOL_VERSION, (int)$this->getOption(modLDAP::LDAP_OPT_PROTOCOL_VERSION, 3));
         @ldap_set_option($this->_conn, LDAP_OPT_REFERRALS, (int)$this->getOption(modLDAP::LDAP_OPT_REFERRALS, 0));
         @ldap_set_option($this->_conn, LDAP_OPT_TIMELIMIT, (int)$this->getOption(modLDAP::LDAP_OPT_NETWORK_TIMEOUT, 10));
         @ldap_set_option($this->_conn, LDAP_OPT_TIMELIMIT, (int)$this->getOption(modLDAP::LDAP_OPT_TIMELIMIT, 10));
-        
-        $this->_check = set_time_limit(((int)$this->getOption(modLDAP::LDAP_OPT_NETWORK_TIMEOUT, 10) + (int)$this->getOption(modLDAP::LDAP_OPT_TIMELIMIT, 10)) * 2);
 
         if ($connection_type == 'TLS') {
             $tls = @ldap_start_tls($this->_conn);
@@ -179,19 +174,16 @@ class modLDAPDriver {
             return false;
         }
         
-        $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Authenticating username: ' . $username);
-        
-        // Bind username using desired format
-        $remote_key    = $this->parseBindUsername($username, $password);
-        
         // Data
         $_username = $this->parseBindUsername($username, $password);
         $this->ldap_entries = array(
             'username'      => $username, 
             'password'      => $password, 
-            'remote_key'    => $_username, 
-            'result'        => array(),
+            'remotekey'     => $_username, 
+            'result'        => array()
         );
+        
+        $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Authenticating username: ' . $username);
         
         if ($this->_bind = $this->modldap_bind($_username, $password)) {
             $remote_basedn = $this->parseSearchBaseDN($username); //array
@@ -202,19 +194,28 @@ class modLDAPDriver {
                 return false;
             }
             
-            $_result = array();
+            $_result = array('count'=>0);
             foreach ($remote_basedn as $basedn) {
                 foreach ($remote_filter as $filter) {
                     $basedn = trim($basedn);
                     $filter = trim($filter);
                     
                     if ($_entries = $this->modldap_search_entries($basedn, $filter, $this->_search_attributes)) {
-                        $_result = array_merge($_result, $_entries);
+                        if (isset($_entries['count']) && (int)$_entries['count'] > 0) {
+                            $_result['count'] = $_result['count'] + (int)$_entries['count'];
+                            unset($_entries['count']);
+                            
+                            foreach ($_entries as $ent) {
+                                $_result[] = $ent;
+                                unset($ent);
+                            }
+                        }
+                        unset($_entries);
                     }
                 }
             }
             
-            if (empty($_result)) {
+            if (empty($_result) || $_result['count'] == 0) {
                 return false;
             }
             
