@@ -24,8 +24,27 @@
  * @package modldap
  */
 /**
+ * Debugging your LDAP
+ * -----------------------------------------------------
+ * There are 2 step for debugging your LDAP setting:
+ * 
+ * 1. Test your LDAP configuration using this file
+ *   - Edit some setting below: SECURITY & LDAP CONFIGURATION
+ *   - Make sure the connection successful and you get LDAP entries
+ *   - Go to System Setting > ModLDAP, and change some there that reflect your LDAP configuration
+ * 
+ * 2. Test your ModLDAP setting from MODX using **ModLDAPDebug** Snippet
+ *   - Create a new resource
+ *   - Add this below code into it
+ * 
+ *   [[ModLDAPDebug?
+ *       &username=`MyLdapUsername`
+ *       &password=`MyLdapPassword`
+ *   ]]
+ * 
+ *
  * @package modldap
- */
+**/
 
 /*************************
  * SECURITY: IMPORTANT! *

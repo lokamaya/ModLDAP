@@ -10,6 +10,25 @@ Installation
 
 By default, ModLDAP has been disabled. So you have to edit some System Setting first...
 
+Debugging your LDAP
+-----------------------------------------------------
+There are 2 step for debugging your LDAP setting:
+
+1. Test your LDAP configuration using plain PHP file provided in assets/components/modldap/
+  - View and Edit **_debug.php** file
+  - Make sure the connection successful and you get LDAP entries
+  - Go to System Setting > ModLDAP, and change some there that reflect your LDAP configuration
+
+2. Test your ModLDAP setting from MODX using **ModLDAPDebug** Snippet
+  - Create a new resource
+  - Add this below code into it
+```
+  [[ModLDAPDebug?
+      &username=`MyLdapUsername`
+      &password=`MyLdapPassword`
+  ]]
+```
+
 Changelog
 -----------------------------------------------------
 ModLDAP 2.4.1-alpha
