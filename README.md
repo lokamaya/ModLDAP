@@ -1,7 +1,12 @@
 ModLDAP
 =======
 
-This is an LDAP integration for MODX Revolution, branched from ActiveDirectoryRedux.
+This is an LDAP integration for MODX Revolution, branched from ActiveDirectoryRedux (was modActiveDirectory). 
+
+LDAP is short for *Lightweight Directory Access Protocol* and was developed at the University of Michigan around 1993. There are a number of LDAP-enabled servers around, the most common of which is Microsoft’s ActiveDirectory; there’s an open source choice as well, one which we’ll be using throughout this article series, called OpenLDAP. **ModLDAP** especially designed for OpenLDAP.
+
+In short: ModLDAP is a new extended modUser (modLDAPUser) with ability to authenticate MODX user against LDAP server.
+
 
 Installation
 -----------------------------------------------------
@@ -10,12 +15,22 @@ Installation
 
 By default, ModLDAP has been disabled. So you have to edit some System Setting first...
 
+
+Requirement
+-----------------------------------------------------
+* MODX 2.4.x++ (tested). But also should work on MODX version 2.2.2++ or 2.3.x++ (need a feedback)
+* PHP 5.x++ with LDAP module enable. For PHP 5.6 or newer you will need to compile PHP with OpenLDAP 2.4 or newer (see http://php.net/manual/en/ldap.setup.php for more information for more information).
+* Any LDAP server to work with, including OpenLDAP and Microsoft Active Directory.
+
+
 Debugging your LDAP
 -----------------------------------------------------
 There are 2 step for debugging your LDAP setting:
 
-1. Test your LDAP configuration using plain PHP file provided in assets/components/modldap/
-  - View and Edit **_debug.php** file
+1. Test your LDAP configuration using plain PHP file provided in **assets/components/modldap/_debug.php**
+  - Edit some setting: SECURITY and LDAP CONFIGURATION
+  - Make sure you edit $_securityVAL = "secretword"; and change it.
+  - Access that file using your browser: path/to/file/_debug.php?debug=YourSecretWords
   - Make sure the connection successful and you get LDAP entries
   - Go to System Setting > ModLDAP, and change some there that reflect your LDAP configuration
 
@@ -28,6 +43,7 @@ There are 2 step for debugging your LDAP setting:
       &password=`MyLdapPassword`
   ]]
 ```
+
 
 Changelog
 -----------------------------------------------------

@@ -30,6 +30,8 @@
  * 
  * 1. Test your LDAP configuration using this file
  *   - Edit some setting below: SECURITY & LDAP CONFIGURATION
+ *   - Make sure you edit $_securityVAL = "secretword"; and change it.
+ *   - Access this file using your browser. path/to/file/_debug.php?debug=secretword
  *   - Make sure the connection successful and you get LDAP entries
  *   - Go to System Setting > ModLDAP, and change some there that reflect your LDAP configuration
  * 
