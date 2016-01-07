@@ -8,19 +8,19 @@ LDAP is short for *Lightweight Directory Access Protocol* and was developed at t
 In short: ModLDAP is a new extended modUser (modLDAPUser) with ability to authenticate MODX user against LDAP server.
 
 
+Requirement
+-----------------------------------------------------
+* MODX 2.4.x++ (tested). But also should work on MODX version 2.2.2++ or 2.3.x++ (need a feedback)
+* PHP 5.x++ with LDAP module enabled. For PHP 5.6 or newer you will need to compile PHP with OpenLDAP 2.4 or newer (for more information see http://php.net/manual/en/ldap.setup.php).
+* Any LDAP server to work with, including OpenLDAP and Microsoft Active Directory.
+
+
 Installation
 -----------------------------------------------------
 * Simply install via Package Management in MODX Revolution Manager page.
 * After installing this package, go to System Setting > ModLDAP, change some setting there.
 
 By default, ModLDAP has been disabled. So you have to edit some System Setting first...
-
-
-Requirement
------------------------------------------------------
-* MODX 2.4.x++ (tested). But also should work on MODX version 2.2.2++ or 2.3.x++ (need a feedback)
-* PHP 5.x++ with LDAP module enable. For PHP 5.6 or newer you will need to compile PHP with OpenLDAP 2.4 or newer (for more information see http://php.net/manual/en/ldap.setup.php).
-* Any LDAP server to work with, including OpenLDAP and Microsoft Active Directory.
 
 
 Debugging your LDAP
