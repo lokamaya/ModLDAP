@@ -32,7 +32,7 @@ There are 2 step for debugging your LDAP setting:
   - Make sure you edit $_securityVAL = "secretword"; and change it.
   - Access that file using your browser: path/to/file/_debug.php?debug=YourSecretWords
   - Make sure the connection successful and you get LDAP entries
-  - Go to System Setting > ModLDAP, and change some there that reflect your LDAP configuration
+  - Go to System Setting > ModLDAP, and change some setting there that reflect your LDAP configuration
 
 2. Test your ModLDAP setting from MODX using **ModLDAPDebug** Snippet
   - Create a new resource
