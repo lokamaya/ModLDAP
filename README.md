@@ -3,7 +3,7 @@ ModLDAP
 
 This is an LDAP integration for MODX Revolution, branched from ActiveDirectoryRedux (was modActiveDirectory). 
 
-LDAP is short for *Lightweight Directory Access Protocol* and was developed at the University of Michigan around 1993. There are a number of LDAP-enabled servers around, the most common of which is Microsoft’s ActiveDirectory; there’s an open source choice as well, one which we’ll be using throughout this article series, called OpenLDAP. ModLDAP especially designed for OpenLDAP.
+LDAP is short for *Lightweight Directory Access Protocol* and was developed at the University of Michigan around 1993. There are a number of LDAP-enabled servers around, the most common of which is Microsoft’s ActiveDirectory; there’s an open source choice as well, known as OpenLDAP. ModLDAP especially designed for OpenLDAP.
 
 **In short**: ModLDAP is a new extended modUser (modLDAPUser) with ability to authenticate MODX user against LDAP server.
 
