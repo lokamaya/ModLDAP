@@ -19,7 +19,7 @@ By default, ModLDAP has been disabled. So you have to edit some System Setting f
 Requirement
 -----------------------------------------------------
 * MODX 2.4.x++ (tested). But also should work on MODX version 2.2.2++ or 2.3.x++ (need a feedback)
-* PHP 5.x++ with LDAP module enable. For PHP 5.6 or newer you will need to compile PHP with OpenLDAP 2.4 or newer (see http://php.net/manual/en/ldap.setup.php for more information for more information).
+* PHP 5.x++ with LDAP module enable. For PHP 5.6 or newer you will need to compile PHP with OpenLDAP 2.4 or newer (for more information see http://php.net/manual/en/ldap.setup.php).
 * Any LDAP server to work with, including OpenLDAP and Microsoft Active Directory.
 
 
