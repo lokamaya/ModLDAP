@@ -1,5 +1,11 @@
 Changelog for ModLDAP.
 
+ModLDAP 2.4.1-beta
+======================
+- Fix: [OnUserNotFound event] New LDAP user authenticated, created, and logged in
+- Fix: ModUSERLdap class
+- Add some prop to languages
+
 ModLDAP 2.4.1-alpha
 ======================
 - Developed and tested on MODX Revo 2.4.2

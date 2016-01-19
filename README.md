@@ -47,7 +47,12 @@ There are 2 step for debugging your LDAP setting:
 
 Changelog
 -----------------------------------------------------
-ModLDAP 2.4.1-alpha
+**ModLDAP 2.4.1-beta**
+- Fix: [OnUserNotFound event] New LDAP user authenticated, created, and logged in
+- Fix: ModUSERLdap class
+- Add some prop to languages
+
+**ModLDAP 2.4.1-alpha**
 - Developed and tested on MODX Revo 2.4.2
 - Refactoring modLDAP base class
 - Refactoring LDAP Driver for connection and authentication
