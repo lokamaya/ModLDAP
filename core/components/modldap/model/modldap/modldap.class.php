@@ -142,10 +142,13 @@ class modLDAP {
             $this->modx->event->output(false);
             return;
         }
-        $this->set('username', $scriptProperties['username']);
-        $user = $user->createUserFromLDAP($user->Driver->getLdapEntries());
-        $this->modx->event->_output = $user;
-        $this->modx->event->stopPropagation();
+        
+        if ($user->createUserFromLDAP($scriptProperties['username'], $user->Driver->getLdapEntries())) {
+            $this->modx->event->output(true);
+            $this->modx->event->_output = $user;
+            $this->modx->event->stopPropagation();
+            return;
+        }
 
         return;
     }
@@ -199,7 +202,7 @@ class modLDAP {
         }
 
         /* modLDAPUser: update user profile from LDAP entries */
-        $user = $user->updateUserFromLDAP($user->Driver->getLdapEntries());
+        $user->updateUserFromLDAP($user->Driver->getLdapEntries());
 
         $scriptProperties['user'] = $user;
         $this->modx->event->params = $scriptProperties;

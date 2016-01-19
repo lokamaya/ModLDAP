@@ -57,7 +57,7 @@ class modLDAPUser extends modUser {
     * @param string $password
     * @return void
     **/
-    public function createUserFromLDAP($entries, $username) {
+    public function createUserFromLDAP($username, $entries) {
         $this->set_ldap_entries($entries);
         unset($entries);
         
@@ -327,6 +327,8 @@ class modLDAPUser extends modUser {
         
         // Get entries ...
         $entries = $this->ldap_entries;
+        if (!is_array($entries)) return array();
+        if (empty($entries)) return array();
         
         // Get mapping field
         $cn = $field;
