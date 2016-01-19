@@ -5,21 +5,21 @@
 $properties = array(
     array(
         'name' => 'username',
-        'desc' => 'Client: LDAP Username',
+        'desc' => 'prop_modldap.ldap_username',
         'type' => 'textfield',
         'options' => '',
         'value' => '',
     ),
     array(
         'name' => 'password',
-        'desc' => 'Client: LDAP Password',
+        'desc' => 'prop_modldap.ldap_password',
         'type' => 'textfield',
         'options' => '',
         'value' => '',
     ),
     array(
         'name' => '_object',
-        'desc' => 'Distinguish scriptProperties',
+        'desc' => 'prop_modldap.distinguish_object',
         'type' => 'textfield',
         'options' => '',
         'value' => 'ModLDAP Snippet',

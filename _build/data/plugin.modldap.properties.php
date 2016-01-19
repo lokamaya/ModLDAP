@@ -5,7 +5,7 @@
 $properties = array(
     array(
         'name' => '_object',
-        'desc' => 'Distinguish scriptProperties',
+        'desc' => 'prop_modldap.distinguish_object',
         'type' => 'textfield',
         'options' => '',
         'value' => 'ModLDAP Plugin',

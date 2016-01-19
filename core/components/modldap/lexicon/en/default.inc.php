@@ -129,3 +129,8 @@ $_lang['setting_modldap.photo_import_size']         = 'Max Photo Size';
 $_lang['setting_modldap.photo_import_size_desc']    = 'Maximum size for photo. Default 300 pixel.';
 $_lang['setting_modldap.photo_import_quality']      = 'Max Photo Size';
 $_lang['setting_modldap.photo_import_quality_desc'] = 'JPEG image quality between 0-100. Default 75.';
+
+/* Properties */
+$_lang['prop_modldap.distinguish_object'] = 'Distinguish object';
+$_lang['prop_modldap.ldap_username'] = 'LDAP Username';
+$_lang['prop_modldap.ldap_password'] = 'LDAP Password';
