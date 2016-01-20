@@ -1,8 +1,3 @@
 <?php
 
-$xpdo_meta_map = array (
-  'modUser' => 
-  array (
-    0 => 'modLDAPUser',
-  ),
-);
+$xpdo_meta_map = array ();

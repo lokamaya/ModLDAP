@@ -29,21 +29,32 @@
  * @package modldap
  * @subpackage build
 **/
-$success = true;
 if ($object->xpdo) {
+    /** @var modX $modx */
+    $modx =& $object->xpdo;
+
     switch ($options[xPDOTransport::PACKAGE_ACTION]) {
-        /* ensure setting is correct on install and upgrade */
         case xPDOTransport::ACTION_INSTALL:
         case xPDOTransport::ACTION_UPGRADE:
-            $modx =& $object->xpdo;
-            $modelPath = $modx->getOption('modldap.core_path',null,$modx->getOption('core_path').'components/modldap/').'model/';
-            //$modx->addPackage('modldap',$modelPath);
+            $modelPath = $modx->getOption('modldap.core_path');
+
+            if (empty($modelPath)) {
+                $modelPath = '[[++core_path]]components/modldap/model/';
+            }
+
+            if ($modx instanceof modX) {
+                //$modx->addExtensionPackage('modldap', $modelPath);
+                $modx->addExtensionPackage('modldapuser', $modelPath);
+            }
 
             break;
-        /* remove on uninstall */
         case xPDOTransport::ACTION_UNINSTALL:
+            if ($modx instanceof modX) {
+                //$modx->removeExtensionPackage('modldap');
+                $modx->removeExtensionPackage('modldapuser', $modelPath);
+            }
+
             break;
     }
 }
-
-return $success;
+return true;
