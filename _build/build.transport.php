@@ -12,7 +12,7 @@ set_time_limit(0);
 define('PKG_NAME',      'ModLDAP');
 define('PKG_NAME_LOWER',strtolower(PKG_NAME));
 define('PKG_VERSION',   '2.4.1');
-define('PKG_RELEASE',   'beta');
+define('PKG_RELEASE',   'beta2');
 
 echo "<pre>";
 /* define sources */

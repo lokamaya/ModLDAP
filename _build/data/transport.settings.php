@@ -331,7 +331,7 @@ $settings['modldap.field_fax']->fromArray(array(
 $settings['modldap.field_photo']= $modx->newObject('modSystemSetting');
 $settings['modldap.field_photo']->fromArray(array(
        'key' => 'modldap.field_photo',
-       'value' => 'jpegphoto',
+       'value' => '',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
        'area' => 'UserField',
@@ -358,7 +358,7 @@ $settings['modldap.field_website']->fromArray(array(
 $settings['modldap.field_memberof']= $modx->newObject('modSystemSetting');
 $settings['modldap.field_memberof']->fromArray(array(
        'key' => 'modldap.field_memberof',
-       'value' => '',
+       'value' => 'memberof',
        'xtype' => 'textfield',
        'namespace' => 'modldap',
        'area' => 'UserField',
