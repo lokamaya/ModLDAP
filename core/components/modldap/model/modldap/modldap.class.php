@@ -119,6 +119,7 @@ class modLDAP {
         //debug//
         //$this->modx->log(modX::LOG_LEVEL_INFO, '[modLDAP] Conctructing and loading packages...');
         $this->modx->addPackage('modldap', $this->config['modelPath']);
+        $this->modx->addPackage('modldapuser', $this->config['modelPath']);
     }
     
     /********************************

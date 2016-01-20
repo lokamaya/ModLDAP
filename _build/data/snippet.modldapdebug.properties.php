@@ -9,6 +9,7 @@ $properties = array(
         'type' => 'textfield',
         'options' => '',
         'value' => '',
+        'lexicon' => 'modldap:properties',
     ),
     array(
         'name' => 'password',
@@ -16,6 +17,7 @@ $properties = array(
         'type' => 'textfield',
         'options' => '',
         'value' => '',
+        'lexicon' => 'modldap:properties',
     ),
     array(
         'name' => '_object',
@@ -23,6 +25,7 @@ $properties = array(
         'type' => 'textfield',
         'options' => '',
         'value' => 'ModLDAP Snippet',
+        'lexicon' => 'modldap:properties',
     ),
 );
 

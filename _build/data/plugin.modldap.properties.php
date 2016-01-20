@@ -9,6 +9,7 @@ $properties = array(
         'type' => 'textfield',
         'options' => '',
         'value' => 'ModLDAP Plugin',
+        'lexicon' => 'modldap:properties',
     ),
 );
 
