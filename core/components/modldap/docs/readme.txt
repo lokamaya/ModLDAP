@@ -1,11 +1,11 @@
+--------------------
 ModLDAP
-=======
-
-This is an LDAP integration for MODX Revolution, branched from ActiveDirectoryRedux (was modActiveDirectory). 
-
-LDAP is short for *Lightweight Directory Access Protocol* and was developed at the University of Michigan around 1993. There are a number of LDAP-enabled servers around, the most common of which is Microsoft’s ActiveDirectory; there’s an open source choice as well, known as OpenLDAP. ModLDAP especially designed for OpenLDAP.
-
-**In short**: ModLDAP is a new extended modUser (modLDAPUser) with ability to authenticate MODX user against LDAP server.
+--------------------
+Version: 2.4.1 beta
+Since: December 31th, 2015
+Author: Zaenal Muttaqin <zaenal(#)lokamaya.com>
+Branched from: ActiveDirectoryRedux 2.4.0 beta1
+--------------------
 
 
 Requirements
@@ -37,29 +37,10 @@ There are 2 step for debugging your LDAP setting:
 2. Test your ModLDAP setting from MODX using **ModLDAPDebug** Snippet
   - Create a new resource
   - Add below code into it
+  
 ```
   [[ModLDAPDebug?
       &username=`MyLdapUsername`
       &password=`MyLdapPassword`
   ]]
 ```
-
-
-Changelog
------------------------------------------------------
-**ModLDAP 2.4.1-beta**
-- Fix: [OnUserNotFound event] New LDAP user authenticated, created, and logged in
-- Fix: ModUSERLdap class
-- Add some prop to languages
-
-**ModLDAP 2.4.1-alpha**
-- Developed and tested on MODX Revo 2.4.2
-- Refactoring modLDAP base class
-- Refactoring LDAP Driver for connection and authentication
-- Refactoring modLDAPUser (extends modUSER)
-- Plugin has been modified
-- A lot of modification to ModLDAP System Setting
-- [NEW] Snippet for debuging: ModLDAPDebug
-- [NEW] Import user photo from LDAP 
-- [NEW] Add LDAP User to certain group and role
-- [NOT IMPLEMENTED] Add LDAP Group to MODX

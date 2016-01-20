@@ -2,10 +2,10 @@
 /**
  * ModLDAP
  *
- * Copyright 2010 by Shaun McCormick <shaun@modx.com>
+ * Copyright 2016 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
- * This file is part of ModLDAP, which integrates LDAP
- * authentication into MODx Revolution.
+ * This file is part of ModLDAP, which integrates LDAP authentication
+ * into MODx Revolution.
  *
  * ModLDAP is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by the Free
@@ -21,18 +21,12 @@
  * ModLDAP; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @package ModLDAP
+ * @package modldap
  */
 /**
- * ModLDAP build functions
- *
- * @package ModLDAP
- * @subpackage build
+ * @package modldap
+ * @subpackage controllers
  */
-function getSnippetContent($filename) {
-    $o = file_get_contents($filename);
-    $o = str_replace('<?php','',$o);
-    $o = str_replace('?>','',$o);
-    $o = trim($o);
-    return $o;
-}
+require_once dirname(dirname(__FILE__)).'/model/modldap/modldap.class.php';
+$modldap = new ModLDAP($modx);
+return $modldap->initialize('mgr');

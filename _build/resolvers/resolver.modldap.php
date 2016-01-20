@@ -21,12 +21,29 @@
  * ModLDAP; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @package ModLDAP
+ * @package modldap
  */
 /**
- * Build the setup options form.
+ * Add modldap package path to extension_packages setting
  *
- * @package ModLDAP
+ * @package modldap
  * @subpackage build
- */
-return '';
+**/
+$success = true;
+if ($object->xpdo) {
+    switch ($options[xPDOTransport::PACKAGE_ACTION]) {
+        /* ensure setting is correct on install and upgrade */
+        case xPDOTransport::ACTION_INSTALL:
+        case xPDOTransport::ACTION_UPGRADE:
+            $modx =& $object->xpdo;
+            $modelPath = $modx->getOption('modldap.core_path',null,$modx->getOption('core_path').'components/modldap/').'model/';
+            //$modx->addPackage('modldap',$modelPath);
+
+            break;
+        /* remove on uninstall */
+        case xPDOTransport::ACTION_UNINSTALL:
+            break;
+    }
+}
+
+return $success;

@@ -1,6 +1,6 @@
 <?php
 /**
- * ModLDAP
+ * ModLDAPDebug
  *
  * Copyright 2016 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
  *
@@ -21,12 +21,26 @@
  * ModLDAP; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
- * @package ModLDAP
+ * @package modldap
  */
 /**
- * Build the setup options form.
- *
- * @package ModLDAP
- * @subpackage build
- */
-return '';
+ * Usage:
+ * - Create a resource
+ * - Put this code onto that resource:
+
+[[!ModLDAPDebug? 
+  &username=`ldapUsername` 
+  &password=`ldapPassword`
+]]
+
+ * @package modldap
+**/
+$modLDAP = $modx->getService('modldap', 'modLDAP', $modx->getOption('modldap.core_path', null, $modx->getOption('core_path') . 'components/modldap/') . 'model/modldap/', $scriptProperties);
+if (!($modLDAP instanceof modLDAP)) {
+    $modx->log(modX::LOG_LEVEL_ERROR, '[ModLDAP] Could not load ModLDAP class.');
+    return;
+}
+
+if (!isset($scriptProperties['username']) || empty($scriptProperties['username']) || !isset($scriptProperties['password']) || empty($scriptProperties['password'])) return "Username or Password is empty!";
+
+return $modLDAP->testModLDAP($scriptProperties['username'], $scriptProperties['password']);
