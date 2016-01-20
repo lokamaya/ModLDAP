@@ -50,6 +50,84 @@ class modLDAPUser extends modUser {
     }
 
     /**
+     * Inherited function
+     *
+     * public function set($k, $v= null, $vType= '');
+     * public function setSudo($sudo);
+     **** public function save($cacheFlag = false);
+     * public function remove(array $ancestors = array());
+     * public function loadAttributes($target, $context = '', $reload = false) 
+     * public function isAuthenticated($sessionContext= 'web')
+     * public function endSession()
+     * public function passwordMatches($password, array $options = array())
+     * public function activatePassword($key)
+     **** public function changePassword($newPassword, $oldPassword, $validateOldPassword = true)
+     * public function getSessionContexts()
+     * public function addSessionContext($context)
+     * public function generateToken($salt)
+     * public function getUserToken($ctx = '')
+     * public function removeSessionContext($context)
+     * public function removeSessionContextVars($context)
+     * public function removeSessionContextVars($context)
+     * public function removeSessionCookie($context)
+     * public function hasSessionContext($context)
+     * public function countMessages($read = '')
+     * public function getSettings()
+     * public function getUserGroupSettings()
+     * public function getResourceGroups($ctx = '')
+     * public function getUserGroups()
+     * public function getPrimaryGroup()
+     * public function getUserGroupNames()
+     * public function isMember($groups,$matchAll = false)
+     * public function joinGroup($groupId,$roleId = null,$rank = null)
+     * public function leaveGroup($groupId)
+     * public function removeLocks(array $options = array())
+     * public function generatePassword($length = 10,array $options = array())
+     * public function sendEmail($message,array $options = array())
+     * public function getDashboard()
+     **** public function getPhoto($width = 128, $height = 128, $default = '')
+     * public function getProfilePhoto($width = 128, $height = 128)
+     * public function getGravatar($size = 128, $default = 'mm')
+    **/
+    
+    /**
+     * Overrides modUser::save
+     *
+     * {@inheritDoc}
+     */
+    public function save($cacheFlag = false, $fromLDAP=true) {
+        $isNew = $this->isNew();
+        return parent :: save($cacheFlag);
+    }
+    
+    /**
+     * Overrides modUser::changePassword
+     *
+     * We can not change LDAP Password
+     */
+    public function changePassword($newPassword, $oldPassword, $validateOldPassword = true) {
+        $changed= false;
+        return $changed;
+    }
+    
+    /**
+     * Overrides modUser::getPhoto
+     *
+     * {@inheritDoc}
+     */
+    public function getPhoto($width = 128, $height = 128, $default = '') {
+        $img = $default;
+
+        if ($this->Profile->photo) {
+            $img = $this->getProfilePhoto($width, $height);
+        } elseif ($this->xpdo->getOption('enable_gravatar')) {
+            $img = $this->getGravatar($width);
+        }
+
+        return $img;
+    }
+    
+    /**
     * Sync from LDAP to MODx
     * 
     * @param array $entries
@@ -89,8 +167,6 @@ class modLDAPUser extends modUser {
     * Sync from LDAP to MODx
     * 
     * @param array $entries
-    * @param string $username
-    * @param string $password
     * @return void
     **/
     public function updateUserFromLDAP($entries) {        
@@ -178,8 +254,6 @@ class modLDAPUser extends modUser {
     /**
     * Auto-Add MODX User's Group
     * 
-    * @param modLDAPUser $user
-    * @param array $entries An array of entries returned from LDAP
     * @return void
     **/
     public function autoAddGroupToUserLDAP() {
@@ -219,8 +293,6 @@ class modLDAPUser extends modUser {
     /**
     * Sync LDAP User's Group (not implemented)
     * 
-    * @param modLDAPUser $user
-    * @param array $entries An array of entries returned from LDAP
     * @return void
     **/
     public function autoSyncGroupFromUserLDAP() {
@@ -282,6 +354,7 @@ class modLDAPUser extends modUser {
     * Remove LDAP entry;
     * 
     * @param  string $field
+    * @param  string $replace
     * @return string
     **/
     public function cleanup_ldap_entries($field="photo", $replace='%blob%') {

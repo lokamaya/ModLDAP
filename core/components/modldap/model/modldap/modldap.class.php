@@ -309,7 +309,7 @@ class modLDAP {
      * @return object modLDAPDriver
     **/
     public function loadDriver() {
-        $modldapdriver = $this->modx->getService('modldapdriver', 'modLDAPDriver', $this->config['modelPath'] . 'modldapuser/');
+        $modldapdriver = $this->modx->getService('modldapdriver', 'modLDAPDriver', $this->config['modelPath'] . 'modldap/');
 
         if (!($modldapdriver instanceof modLDAPDriver)) {
             $this->modx->log(modX::LOG_LEVEL_ERROR,'[ModLDAP] Could not load modLDAPDriver class from: ' . $this->config['modelPath']);
