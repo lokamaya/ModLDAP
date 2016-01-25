@@ -116,10 +116,7 @@ class modLDAP {
             'hooksPath'         => $corePath . 'hooks/',
         ), $config);
         
-        //debug//
-        //$this->modx->log(modX::LOG_LEVEL_INFO, '[modLDAP] Conctructing and loading packages...');
-        //$this->modx->addPackage('modldap', $this->config['modelPath']);
-        //$this->modx->addPackage('modldapuser', $this->config['modelPath']);
+        $this->modx->addPackage('modldapuser', $this->config['modelPath']);
     }
     
     /********************************
@@ -207,7 +204,7 @@ class modLDAP {
 
         $scriptProperties['user'] = $user;
         $this->modx->event->params = $scriptProperties;
-        $this->modx->event->output(true);
+        //$this->modx->event->output(true);
         $this->modx->event->_output = true;
 
         return;

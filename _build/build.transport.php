@@ -12,7 +12,7 @@ set_time_limit(0);
 define('PKG_NAME',      'ModLDAP');
 define('PKG_NAME_LOWER',strtolower(PKG_NAME));
 define('PKG_VERSION',   '2.4.1');
-define('PKG_RELEASE',   'beta2');
+define('PKG_RELEASE',   'beta3');
 
 echo "<pre>";
 /* define sources */
@@ -47,7 +47,9 @@ $modx->loadClass('transport.modPackageBuilder', '', false, true);
 
 $builder = new modPackageBuilder($modx);
 $builder->createPackage(PKG_NAME, PKG_VERSION, PKG_RELEASE);
-$builder->registerNamespace(PKG_NAME_LOWER,false,true,'{core_path}components/'.PKG_NAME_LOWER.'/');
+$builder->registerNamespace(PKG_NAME_LOWER, false, true, '{core_path}components/'.PKG_NAME_LOWER.'/', '{assets_path}components/'.PKG_NAME_LOWER.'/');
+$builder->registerNamespace('modldapuser', false, true, '{core_path}components/'.PKG_NAME_LOWER.'/', '{assets_path}components/'.PKG_NAME_LOWER.'/');
+
 
 
 /* PLUGINS */

@@ -112,7 +112,7 @@ class modLDAPDriver {
         @ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, $this->_ldapDebugLevel);
         
         $dc = $this->getRandomController();
-        if ($connection_type = 'SSL') {
+        if ($connection_type == 'SSL') {
             $this->logDebug(modX::LOG_LEVEL_INFO, '[ModLDAP:Driver] Connecting to ldaps://' . $dc . ' using ' . $connection_type . ' connection!');
             $this->_conn = @ldap_connect("ldaps://".$dc, $connection_port);
         } else {
