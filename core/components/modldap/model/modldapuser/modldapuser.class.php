@@ -3,6 +3,9 @@
  * ModLDAP
  *
  * Copyright 2016 by Zaenal Muttaqin <zaenal(#)lokamaya.com>
+ * 
+ * Special thanks to:
+ * - Dmitry Shram, Lipetsk State Technical University
  *
  * This file is part of ModLDAP, which integrates LDAP authentication
  * into MODx Revolution.
@@ -266,6 +269,7 @@ class modLDAPUser extends modUser {
         $modx_roles = array_map("trim", explode(',', $modx_group_roles));
 
         $ldap_role  = trim($this->getOption(modLDAP::LDAP_GROUP_ROLE, null, 'Publisher'));
+        
         
         if ($modx_group_add || $ldap_group_add)
             $user_groups = @$this->getUserGroupNames();
